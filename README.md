@@ -110,7 +110,7 @@ a − b < 0   且   k < k_crit = N·(b−a)/Dc
 ### 方式一：CDN 引入（浏览器，零安装）
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/Rro-123/rsf-friction@v1.0.0/rsf.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Rro-123/rsf-friction@v1.1.0/rsf.js"></script>
 <script>
   const 结果 = RSF.computeFriction('granite', 1000, 1e-5);  // 材质、法向力(N)、速度(m/s)
   console.log(结果.frictionForce);  // 摩擦力 (N)

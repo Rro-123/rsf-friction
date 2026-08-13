@@ -160,3 +160,19 @@ test('makeVelocityFunction：支持数字 / 函数 / 分段数组', () => {
   assert.equal(seg(10), 2);
   assert.equal(RSF.makeVelocityFunction(t => t * 2)(3), 6);
 });
+
+// ---------------------------------------------------------------------------
+// 内置材质表完整性
+// ---------------------------------------------------------------------------
+test('内置材质表：至少 62 种，且逐一可被 computeFriction 计算', () => {
+  const keys = Object.keys(RSF.materials);
+  assert.ok(keys.length >= 62, `材质数应 ≥ 62，实际 ${keys.length}`);
+  for (const k of keys) {
+    const m = RSF.materials[k];
+    const v = m.mu0 != null ? 1e-5 : 0.5;   // 岩石走 RSF，工程材料走库仑
+    const r = RSF.computeFriction(k, 1000, v);
+    assert.ok(Number.isFinite(r.mu), `材质 ${k} 的 μ 应为有限值`);
+    assert.ok(Number.isFinite(r.frictionForce), `材质 ${k} 的摩擦力应为有限值`);
+    if (m.mu0 != null) assert.equal(r.mode, 'rsf', `岩石类 ${k} 应走 RSF 模式`);
+  }
+});
