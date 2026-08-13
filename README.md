@@ -99,7 +99,9 @@ a − b < 0   且   k < k_crit = N·(b−a)/Dc
 - **内置 11 种材质参数表**（岩石类含 RSF 参数，工程类含库仑 μ/μ_s）；
 - **自适应 Cash-Karp RK45 求解器**：速度阶跃直接效应、稳态摩擦、静态愈合均与解析解逐位吻合；
 - **四种状态演化律**：Dieterich 老化律、Ruina 滑移律、PRZ、Nagata；
-- 自带 **Canvas 可视化演示页**（`index.html`），直观展示锯齿形粘滑曲线。
+- 自带 **Canvas 可视化演示页**（`index.html`），直观展示锯齿形粘滑曲线；
+- **TypeScript 类型定义**：附带 [`index.d.ts`](index.d.ts)，TS 项目开箱即用类型提示；
+- **自动化测试**：内置 `node:test` 测试套件（`npm test`），核心物理关系与解析解逐位吻合。
 
 ---
 
@@ -130,6 +132,18 @@ const F = RSF.computeFriction('steel', 1000, 0.5).frictionForce;  // 420 N
 ### 方式三：直接下载文件
 
 下载 [`rsf.js`](rsf.js) 放入项目，用 `<script src="rsf.js"></script>`（浏览器）或 `require('./rsf.js')`（Node）引入。
+
+### TypeScript 用户
+
+已附带 [`index.d.ts`](index.d.ts) 类型定义，TS 项目可直接获得完整类型提示：
+
+```ts
+import { RateStateFriction, computeFriction } from 'rsf-friction';
+
+const f = new RateStateFriction({ mu0: 0.6, a: 0.008, b: 0.012, Dc: 5e-6, V0: 1e-6 });
+const mu: number = f.muSS(1e-5);
+const r = computeFriction('granite', 1000, 1e-5);   // ComputeFrictionResult
+```
 
 ---
 
@@ -172,7 +186,9 @@ const F = RSF.computeFriction('steel', 1000, 0.5).frictionForce;  // 420 N
 
 ```
 ├── rsf.js          # 核心库（UMD，零依赖，浏览器 & Node 通用）
+├── index.d.ts      # TypeScript 类型定义
 ├── index.html      # 可视化演示页（含 Canvas 图表）
+├── tests/          # 自动化测试（node:test，npm test）
 ├── 使用指南.md      # 详细使用指南（三变量 → 摩擦力）
 ├── README.md       # 本文件
 ├── LICENSE         # MIT 许可证
