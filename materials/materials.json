@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "rsf-friction 内置材质参数表（与 rsf.js 中 RSF.materials 保持一致）",
     "unit": {
       "mu": "无量纲（库仑动摩擦系数）",

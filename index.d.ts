@@ -1,5 +1,5 @@
 // rsf.js —— 速率-状态摩擦定律（Rate-and-State Friction, RSF）工具库
-// TypeScript 类型定义（v1.1.0）
+// TypeScript 类型定义（v1.2.0）
 
 /** 状态演化律名称。 */
 export type StateLaw = 'aging' | 'slip' | 'prz' | 'nagata';
