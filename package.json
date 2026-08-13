@@ -1,0 +1,22 @@
+{
+  "name": "rsf-friction",
+  "version": "0.1.0",
+  "description": "速率-状态摩擦定律（Rate-and-State Friction, RSF）计算库 — 三变量（材质/压力/速度）计算摩擦力",
+  "main": "rsf.js",
+  "unpkg": "rsf.js",
+  "jsdelivr": "rsf.js",
+  "keywords": [
+    "friction",
+    "rate-and-state",
+    "stick-slip",
+    "tribology",
+    "physics",
+    "rsf"
+  ],
+  "author": "Rro-123",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Rro-123/rsf-friction.git"
+  }
+}

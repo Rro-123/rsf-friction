@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>速率-状态摩擦定律 (RSF) 计算库 · 粘滑现象演示</title>
+<style>
+  :root {
+    --bg: #f5f7fa; --panel: #ffffff; --line: #e3e8ef;
+    --text: #1f2937; --muted: #6b7280; --accent: #2563eb; --accent-dark: #1e40af;
+    --ok: #059669; --warn: #d97706; --mono: #0f172a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6;
+  }
+  header {
+    background: linear-gradient(135deg, #1e3a8a, #2563eb); color: #fff;
+    padding: 28px 24px;
+  }
+  header h1 { margin: 0 0 6px; font-size: 24px; }
+  header p { margin: 0; opacity: .9; font-size: 14px; max-width: 900px; }
+  main { max-width: 980px; margin: 0 auto; padding: 20px 16px 60px; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    margin-bottom: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  }
+  .panel-head {
+    padding: 14px 20px; border-bottom: 1px solid var(--line);
+    display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+  }
+  .panel-head h2 { margin: 0; font-size: 17px; }
+  .panel-head .badge { font-size: 12px; color: var(--muted); }
+  .panel-body { padding: 18px 20px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .field input {
+    width: 100%; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px;
+    font-family: "SF Mono", Consolas, monospace; font-size: 13px; color: var(--mono);
+  }
+  .field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+  .actions { margin: 16px 0 4px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  button {
+    background: var(--accent); color: #fff; border: none; padding: 9px 20px; border-radius: 6px;
+    font-size: 14px; cursor: pointer; font-weight: 600;
+  }
+  button:hover { background: var(--accent-dark); }
+  button.ghost { background: #fff; color: var(--accent); border: 1px solid var(--accent); }
+  .note { font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+  .result { margin-top: 14px; }
+  .result pre {
+    background: #0f172a; color: #e2e8f0; padding: 14px 16px; border-radius: 8px;
+    font-family: "SF Mono", Consolas, monospace; font-size: 12.5px; overflow-x: auto;
+    white-space: pre; line-height: 1.55;
+  }
+  .kv { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px 18px; margin-bottom: 6px; }
+  .kv .item { font-size: 13.5px; }
+  .kv .item b { color: var(--accent); font-family: Consolas, monospace; }
+  table { border-collapse: collapse; width: 100%; font-size: 12.5px; margin-top: 10px; }
+  th, td { border: 1px solid var(--line); padding: 5px 8px; text-align: right; font-family: Consolas, monospace; }
+  th { background: #f1f5f9; font-weight: 600; }
+  td:first-child, th:first-child { text-align: left; }
+  .good { color: var(--ok); font-weight: 700; }
+  .warn { color: var(--warn); font-weight: 700; }
+  .muted { color: var(--muted); }
+  .formula { font-family: "STIX Two Math", "Cambria Math", serif; font-style: italic; background:#f1f5f9; padding: 1px 5px; border-radius:4px; }
+  .chart { width: 100%; height: 260px; display: block; margin-top: 12px; background: #fcfcfd; border: 1px solid var(--line); border-radius: 8px; }
+  .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr 1fr; } .chart-row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>速率-状态摩擦定律 (Rate-and-State Friction) 计算库</h1>
+  <p>基于 Dieterich (1979) 与 Ruina (1983) 的速率-状态摩擦框架，复现粘滑 (stick-slip)、速度阶跃直接效应、静态对数愈合等摩擦物理现象。参考 jrleeman/rsfmodel、EQcycle_failure_laws、RSF_solvers 等实现。</p>
+</header>
+
+<main>
+
+  <!-- ============ 面板 1：核心摩擦计算 ============ -->
+  <section class="panel">
+    <div class="panel-head"><h2>① 核心摩擦计算器</h2><span class="badge">输入摩擦参数 · 法向力 · 速度 → 输出摩擦力</span></div>
+    <div class="panel-body">
+      <div class="grid">
+        <div class="field"><label>参考摩擦系数 μ₀</label><input id="p1_mu0" value="0.6"></div>
+        <div class="field"><label>直接效应系数 a</label><input id="p1_a" value="0.005"></div>
+        <div class="field"><label>演化效应系数 b</label><input id="p1_b" value="0.01"></div>
+        <div class="field"><label>临界滑移距离 Dc (m)</label><input id="p1_Dc" value="1e-5"></div>
+        <div class="field"><label>参考速度 V₀ (m/s)</label><input id="p1_V0" value="1e-6"></div>
+        <div class="field"><label>法向力 N (N)</label><input id="p1_N" value="1000"></div>
+        <div class="field"><label>物体速度 V (m/s)</label><input id="p1_V" value="1e-5"></div>
+        <div class="field"><label>状态 θ (s，留空=稳态 Dc/V)</label><input id="p1_theta" value=""></div>
+      </div>
+      <div class="actions">
+        <button onclick="calcCore()">计算摩擦力</button>
+        <span class="muted">稳态法：θ = Dc/V；瞬时法：给定 θ。</span>
+      </div>
+      <div class="note">
+        本构：<span class="formula">μ(V,θ) = μ₀ + a·ln(V/V₀) + b·ln(V₀θ/Dc)</span>；稳态
+        <span class="formula">μ<sub>ss</sub>(V) = μ₀ + (a−b)·ln(V/V₀)</span>；摩擦力 <span class="formula">F = μ·N</span>。
+      </div>
+      <div class="result" id="out1"></div>
+    </div>
+  </section>
+
+  <!-- ============ 面板 2：粘滑仿真 ============ -->
+  <section class="panel">
+    <div class="panel-head"><h2>② 弹簧-滑块粘滑仿真</h2><span class="badge">准动力模型 · 黏/滑状态机</span></div>
+    <div class="panel-body">
+      <div class="grid">
+        <div class="field"><label>μ₀</label><input id="p2_mu0" value="0.6"></div>
+        <div class="field"><label>a</label><input id="p2_a" value="0.005"></div>
+        <div class="field"><label>b</label><input id="p2_b" value="0.01"></div>
+        <div class="field"><label>Dc (m)</label><input id="p2_Dc" value="1e-5"></div>
+        <div class="field"><label>V₀ (m/s)</label><input id="p2_V0" value="1e-6"></div>
+        <div class="field"><label>法向力 N (N)</label><input id="p2_N" value="1000"></div>
+        <div class="field"><label>弹簧刚度 k (N/m)</label><input id="p2_k" value="1e5"></div>
+        <div class="field"><label>加载速度 V<sub>lp</sub> (m/s)</label><input id="p2_Vlp" value="1e-4"></div>
+        <div class="field"><label>剪切波速 c<sub>s</sub> (m/s)</label><input id="p2_cs" value="3000"></div>
+        <div class="field"><label>仿真时长 (s)</label><input id="p2_tEnd" value="300"></div>
+      </div>
+      <div class="actions">
+        <button onclick="calcStickSlip()">运行粘滑仿真</button>
+        <span class="muted" id="p2_status">辐射阻尼 η = N/(2cₛ)</span>
+      </div>
+      <div class="note">
+        粘滑判据：<span class="formula">a − b &lt; 0</span>（速度弱化）且 <span class="formula">k &lt; k<sub>crit</sub> = N(b−a)/Dc</span>。
+        准动力模型（Rice 1993）：忽略惯性、保留辐射阻尼，以黏着(θ 愈合、静摩擦增长)与滑动(对数律 + 辐射阻尼)两个阶段交替复现锯齿形粘滑。
+      </div>
+      <div class="result" id="out2"></div>
+    </div>
+  </section>
+
+  <!-- ============ 面板 3：速度阶跃实验 ============ -->
+  <section class="panel">
+    <div class="panel-head"><h2>③ 速度阶跃实验（直接效应）</h2><span class="badge">V₁ → V₂ 阶跃</span></div>
+    <div class="panel-body">
+      <div class="grid">
+        <div class="field"><label>μ₀</label><input id="p3_mu0" value="0.6"></div>
+        <div class="field"><label>a</label><input id="p3_a" value="0.005"></div>
+        <div class="field"><label>b</label><input id="p3_b" value="0.01"></div>
+        <div class="field"><label>Dc (m)</label><input id="p3_Dc" value="1e-5"></div>
+        <div class="field"><label>V₀ (m/s)</label><input id="p3_V0" value="1e-6"></div>
+        <div class="field"><label>阶跃前速度 V₁ (m/s)</label><input id="p3_V1" value="1e-6"></div>
+        <div class="field"><label>阶跃后速度 V₂ (m/s)</label><input id="p3_V2" value="1e-5"></div>
+        <div class="field"><label>阶跃时刻 (s)</label><input id="p3_tStep" value="10"></div>
+        <div class="field"><label>总时长 (s)</label><input id="p3_total" value="40"></div>
+      </div>
+      <div class="actions"><button onclick="calcStep()">运行速度阶跃</button></div>
+      <div class="note">
+        阶跃瞬间 μ 跳变 <span class="formula">Δμ<sub>直接</sub> = a·ln(V₂/V₁)</span>（直接效应），随后演化至
+        <span class="formula">Δμ<sub>稳态</sub> = (a−b)·ln(V₂/V₁)</span>。
+      </div>
+      <div class="result" id="out3"></div>
+    </div>
+  </section>
+
+  <!-- ============ 面板 4：静态愈合 ============ -->
+  <section class="panel">
+    <div class="panel-head"><h2>④ 静态愈合（对数时间增长）</h2><span class="badge">slide-hold 解析式</span></div>
+    <div class="panel-body">
+      <div class="grid">
+        <div class="field"><label>μ₀</label><input id="p4_mu0" value="0.6"></div>
+        <div class="field"><label>b</label><input id="p4_b" value="0.01"></div>
+        <div class="field"><label>Dc (m)</label><input id="p4_Dc" value="1e-5"></div>
+        <div class="field"><label>V₀ (m/s)</label><input id="p4_V0" value="1e-6"></div>
+      </div>
+      <div class="actions"><button onclick="calcHealing()">计算愈合曲线</button></div>
+      <div class="note">
+        静止保持 Δt 秒后，状态变量按老化律线性增长 <span class="formula">θ = θ₀ + Δt</span>（θ₀ = Dc/V₀），
+        静摩擦 <span class="formula">μ<sub>s</sub>(Δt) = μ₀ + b·ln(V₀(θ₀+Δt)/Dc)</span> 随静止时间对数增长。
+      </div>
+      <div class="result" id="out4"></div>
+    </div>
+  </section>
+
+</main>
+
+<script src="rsf.js"></script>
+<script>
+'use strict';
+var RSF = window.RSF;
+
+/* ---------- 工具 ---------- */
+function val(id) { return parseFloat(document.getElementById(id).value); }
+function fmt(x, d) {
+  if (x === 0) return '0';
+  if (!isFinite(x)) return String(x);
+  if (isNaN(x)) return 'NaN';
+  var ax = Math.abs(x);
+  if (ax >= 1e5 || ax < 1e-3) return x.toExponential(d != null ? d : 4);
+  return x.toPrecision(d != null ? d : 5);
+}
+function esc(s) { return String(s); }
+function tableHtml(headers, rows) {
+  var h = '<table><thead><tr>' + headers.map(function (c) { return '<th>' + c + '</th>'; }).join('') + '</tr></thead><tbody>';
+  h += rows.map(function (r) {
+    return '<tr>' + r.map(function (c, i) { return '<td' + (i === 0 ? '' : '') + '>' + c + '</td>'; }).join('') + '</tr>';
+  }).join('');
+  return h + '</tbody></table>';
+}
+
+/* ---------- Canvas 折线图（零依赖） ---------- */
+/**
+ * cfg = {
+ *   series: [{ points:[[x,y],...], color, label, width }],
+ *   title, xLabel, yLabel, logX, logY
+ * }
+ */
+function drawChart(canvas, cfg) {
+  var dpr = window.devicePixelRatio || 1;
+  var w = canvas.clientWidth || canvas.offsetWidth || 600;
+  var h = canvas.clientHeight || canvas.offsetHeight || 260;
+  canvas.width = Math.round(w * dpr);
+  canvas.height = Math.round(h * dpr);
+  var ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+
+  var M = { top: 30, right: 16, bottom: 42, left: 62 };
+  var pw = w - M.left - M.right, ph = h - M.top - M.bottom;
+  if (pw <= 10 || ph <= 10) return;
+
+  var logX = !!cfg.logX, logY = !!cfg.logY;
+  var xs = [], ys = [];
+  cfg.series.forEach(function (s) { s.points.forEach(function (p) { xs.push(p[0]); ys.push(p[1]); }); });
+  if (!xs.length) return;
+
+  function cv(v, log) { var t = log ? Math.log10(v) : v; return isFinite(t) ? t : null; }
+  var cxs = [], cys = [];
+  for (var k = 0; k < xs.length; k++) { cxs.push(cv(xs[k], logX)); cys.push(cv(ys[k], logY)); }
+  var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  cxs.forEach(function (v) { if (v != null) { if (v < x0) x0 = v; if (v > x1) x1 = v; } });
+  cys.forEach(function (v) { if (v != null) { if (v < y0) y0 = v; if (v > y1) y1 = v; } });
+  if (!isFinite(x0) || !isFinite(y0)) return;
+  var xpad = (x1 - x0) * 0.04 || 0.1, ypad = (y1 - y0) * 0.08 || 0.1;
+  x0 -= xpad; x1 += xpad; y0 -= ypad; y1 += ypad;
+
+  function px(x) { return M.left + (x - x0) / (x1 - x0) * pw; }
+  function py(y) { return M.top + ph - (y - y0) / (y1 - y0) * ph; }
+  function fmtTick(v) { return fmt(v, 3); }
+
+  ctx.font = '11px -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif';
+  ctx.lineWidth = 1;
+
+  var nx = 5, ny = 4, i, j, X, Y;
+  ctx.strokeStyle = '#edf0f4';
+  ctx.fillStyle = '#6b7280';
+  for (i = 0; i <= nx; i++) {
+    X = px(x0 + (x1 - x0) * i / nx);
+    ctx.beginPath(); ctx.moveTo(X, M.top); ctx.lineTo(X, M.top + ph); ctx.stroke();
+    ctx.textAlign = 'center';
+    ctx.fillText(fmtTick(logX ? Math.pow(10, x0 + (x1 - x0) * i / nx) : x0 + (x1 - x0) * i / nx), X, M.top + ph + 16);
+  }
+  for (j = 0; j <= ny; j++) {
+    Y = py(y0 + (y1 - y0) * j / ny);
+    ctx.beginPath(); ctx.moveTo(M.left, Y); ctx.lineTo(M.left + pw, Y); ctx.stroke();
+    ctx.textAlign = 'right';
+    ctx.fillText(fmtTick(logY ? Math.pow(10, y0 + (y1 - y0) * j / ny) : y0 + (y1 - y0) * j / ny), M.left - 7, Y + 4);
+  }
+
+  if (cfg.title) {
+    ctx.fillStyle = '#111827'; ctx.font = 'bold 13px -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif';
+    ctx.textAlign = 'center'; ctx.fillText(cfg.title, M.left + pw / 2, 15);
+  }
+  if (cfg.xLabel) { ctx.fillStyle = '#374151'; ctx.textAlign = 'center'; ctx.fillText(cfg.xLabel, M.left + pw / 2, h - 5); }
+  if (cfg.yLabel) {
+    ctx.fillStyle = '#374151'; ctx.save();
+    ctx.translate(15, M.top + ph / 2); ctx.rotate(-Math.PI / 2); ctx.textAlign = 'center';
+    ctx.fillText(cfg.yLabel, 0, 0); ctx.restore();
+  }
+
+  cfg.series.forEach(function (s) {
+    ctx.strokeStyle = s.color || '#2563eb'; ctx.lineWidth = s.width || 2;
+    ctx.beginPath(); var started = false;
+    s.points.forEach(function (p) {
+      var cx = cv(p[0], logX), cy = cv(p[1], logY);
+      if (cx == null || cy == null) { started = false; return; }
+      var XX = px(cx), YY = py(cy);
+      if (!started) { ctx.moveTo(XX, YY); started = true; } else ctx.lineTo(XX, YY);
+    });
+    ctx.stroke();
+  });
+
+  if (cfg.series.length > 1) {
+    var lx = M.left + 8, ly = M.top + 6;
+    ctx.font = '11px -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif';
+    ctx.textAlign = 'left';
+    cfg.series.forEach(function (s) {
+      ctx.strokeStyle = s.color || '#2563eb'; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(lx, ly + 3); ctx.lineTo(lx + 16, ly + 3); ctx.stroke();
+      ctx.fillStyle = '#111827'; ctx.fillText(s.label || '', lx + 20, ly + 7);
+      lx += 22 + ctx.measureText(s.label || '').width + 18;
+    });
+  }
+}
+
+/* ---------- 面板 1：核心计算 ---------- */
+function calcCore() {
+  var el = document.getElementById('out1');
+  try {
+    var mu0 = val('p1_mu0'), a = val('p1_a'), b = val('p1_b'),
+        Dc = val('p1_Dc'), V0 = val('p1_V0'), N = val('p1_N'), V = val('p1_V');
+    var thetaIn = document.getElementById('p1_theta').value.trim();
+    if (V <= 0) throw new Error('速度 V 必须 > 0');
+    var f = new RSF.RateStateFriction({ mu0: mu0, a: a, b: b, Dc: Dc, V0: V0 });
+
+    var thetaSS = f.thetaSS(V, 0);
+    var useSS = thetaIn === '';
+    var theta = useSS ? thetaSS : parseFloat(thetaIn);
+
+    var mu = f.mu(V, [theta]);
+    var F = mu * N;
+    var muSS = f.muSS(V);
+    var Fss = muSS * N;
+    var ab = a - b;
+    var stab = f.stability(N, Infinity);
+
+    var html = '<div class="kv">' +
+      '<div class="item">稳态状态 θ<sub>ss</sub> = <b>' + fmt(thetaSS) + ' s</b></div>' +
+      '<div class="item">瞬时摩擦系数 μ(V,θ) = <b>' + fmt(mu, 6) + '</b></div>' +
+      '<div class="item">瞬时摩擦力 F = <b>' + fmt(F, 6) + ' N</b></div>' +
+      '<div class="item">稳态摩擦系数 μ<sub>ss</sub>(V) = <b>' + fmt(muSS, 6) + '</b></div>' +
+      '<div class="item">稳态摩擦力 F<sub>ss</sub> = <b>' + fmt(Fss, 6) + ' N</b></div>' +
+      '<div class="item">a − b = <b>' + fmt(ab, 5) + '</b> → ' + (ab < 0 ? '速度弱化' : '速度强化') + '</div>' +
+      '</div>';
+    html += '<p class="note">' + (useSS ? '当前采用稳态状态 θ = Dc/V = ' + fmt(thetaSS) + ' s。' : '采用手动状态 θ = ' + fmt(theta) + ' s。') +
+      ' 剪应力 τ = μ·σₙ（若已知正应力 σₙ = N/接触面积）。</p>';
+    html += '<canvas class="chart" id="chart1"></canvas>';
+    el.innerHTML = html;
+
+    var pts = [];
+    for (var k = 0; k <= 80; k++) {
+      var vv = 1e-7 * Math.pow(10, k * 4 / 80); // V 从 1e-7 到 1e-3
+      pts.push([vv, f.muSS(vv)]);
+    }
+    drawChart(document.getElementById('chart1'), {
+      title: '稳态摩擦系数 μ_ss(V) 随速度变化（对数速度轴）',
+      xLabel: '速度 V (m/s)', yLabel: 'μ_ss',
+      logX: true,
+      series: [{ points: pts, color: '#2563eb', label: 'μ_ss(V)' }]
+    });
+  } catch (e) { el.innerHTML = '<pre>错误：' + esc(e.message) + '</pre>'; }
+}
+
+/* ---------- 面板 2：粘滑仿真 ---------- */
+function calcStickSlip() {
+  var el = document.getElementById('out2');
+  var st = document.getElementById('p2_status');
+  st.textContent = '计算中…';
+  // 让浏览器先渲染“计算中”
+  setTimeout(function () {
+    try {
+      var p = {
+        mu0: val('p2_mu0'), a: val('p2_a'), b: val('p2_b'), Dc: val('p2_Dc'), V0: val('p2_V0'),
+        N: val('p2_N'), k: val('p2_k'), Vlp: val('p2_Vlp'), cs: val('p2_cs')
+      };
+      var tEnd = val('p2_tEnd');
+      var f = new RSF.RateStateFriction(p);
+      var stab = f.stability(p.N, p.k);
+
+      var slider = new RSF.StickSlipSlider(p);
+      var r = slider.run(tEnd, { samples: 4000 });
+
+      var eta = slider.eta;
+      var n = r.events.length;
+      var recurring = n > 1;
+
+      var html = '<div class="kv">' +
+        '<div class="item">稳定性：<span class="' + (stab.stickSlip ? 'good' : (stab.weakening ? 'warn' : '')) + '">' + esc(stab.message) + '</span></div>' +
+        '<div class="item">临界刚度 k<sub>crit</sub> = <b>' + fmt(stab.kcrit) + ' N/m</b></div>' +
+        '<div class="item">辐射阻尼 η = <b>' + fmt(eta) + ' N·s/m</b></div>' +
+        '<div class="item">滑移事件数 = <b>' + n + '</b>' + (recurring ? '' : '（含初始瞬态）') + '</div>' +
+        '</div>';
+
+      if (n > 0) {
+        var rows = r.events.slice(0, 20).map(function (e, i) {
+          var rec = i > 0 ? e.tOnset - r.events[i - 1].tOnset : null;
+          return [
+            (i + 1),
+            fmt(e.tOnset, 5),
+            fmt(e.muPeak, 5),
+            fmt(e.muMin, 5),
+            fmt(e.stressDrop || 0, 4),
+            fmt(e.vPeak || 0, 3),
+            fmt(e.slipDistance || 0, 3),
+            rec == null ? '—' : fmt(rec, 4)
+          ];
+        });
+        html += '<p class="note">前 ' + Math.min(20, n) + ' 次滑移事件（t：起始时刻，μ峰值，μ谷值，应力降 ΔF，峰值滑移速度，滑移距离，复发间隔）：</p>';
+        html += tableHtml(['#', 't (s)', 'μ峰值', 'μ谷值', '应力降 (N)', '峰值速度 (m/s)', '滑移距离 (m)', '复发间隔 (s)'], rows);
+
+        if (recurring) {
+          var recs = [];
+          for (var i = 1; i < n; i++) recs.push(r.events[i].tOnset - r.events[i - 1].tOnset);
+          var avg = recs.reduce(function (a, b) { return a + b; }, 0) / recs.length;
+          html += '<p class="note">平均复发间隔 ≈ <b>' + fmt(avg, 4) + ' s</b>。</p>';
+        }
+      } else {
+        html += '<p class="note">未检测到滑移事件（稳定滑动）。</p>';
+      }
+
+      // 时间序列摘要（降采样）
+      var step = Math.max(1, Math.floor(r.t.length / 40));
+      var tsRows = [];
+      for (var j = 0; j < r.t.length; j += step) {
+        tsRows.push([fmt(r.t[j], 4), fmt(r.mu[j], 5), fmt(r.velocity[j], 3), fmt(r.frictionForce[j], 5)]);
+      }
+      tsRows.push([fmt(r.t[r.t.length - 1], 4), fmt(r.mu[r.mu.length - 1], 5),
+                   fmt(r.velocity[r.velocity.length - 1], 3), fmt(r.frictionForce[r.frictionForce.length - 1], 5)]);
+      html += '<p class="note">时间序列摘要（μ 呈锯齿形：缓慢加载上升 → 快速滑移骤降）：</p>';
+      html += tableHtml(['t (s)', 'μ', '速度 V (m/s)', '摩擦力 F (N)'], tsRows);
+
+      html += '<div class="chart-row"><canvas class="chart" id="chart2a"></canvas><canvas class="chart" id="chart2b"></canvas></div>';
+      el.innerHTML = html;
+
+      var muPts = [];
+      var step2 = Math.max(1, Math.floor(r.t.length / 800));
+      for (var k2 = 0; k2 < r.t.length; k2 += step2) muPts.push([r.t[k2], r.mu[k2]]);
+      muPts.push([r.t[r.t.length - 1], r.mu[r.mu.length - 1]]);
+      drawChart(document.getElementById('chart2a'), {
+        title: '摩擦系数 μ(t) — 锯齿形粘滑',
+        xLabel: '时间 t (s)', yLabel: 'μ',
+        series: [{ points: muPts, color: '#2563eb' }]
+      });
+
+      var vPts = [];
+      for (var k3 = 0; k3 < r.t.length; k3++) { if (r.velocity[k3] > 0) vPts.push([r.t[k3], r.velocity[k3]]); }
+      var vPts2 = [];
+      var step3 = Math.max(1, Math.floor(vPts.length / 800));
+      for (var k4 = 0; k4 < vPts.length; k4 += step3) vPts2.push(vPts[k4]);
+      drawChart(document.getElementById('chart2b'), {
+        title: '滑块速度 V(t) — 滑移尖峰（对数轴）',
+        xLabel: '时间 t (s)', yLabel: 'V (m/s)',
+        logY: true,
+        series: [{ points: vPts2, color: '#d97706' }]
+      });
+
+      st.textContent = '辐射阻尼 η = N/(2cₛ) = ' + fmt(eta) + ' N·s/m';
+    } catch (e) {
+      el.innerHTML = '<pre>错误：' + esc(e.message) + '</pre>';
+      st.textContent = '辐射阻尼 η = N/(2cₛ)';
+    }
+  }, 30);
+}
+
+/* ---------- 面板 3：速度阶跃 ---------- */
+function calcStep() {
+  var el = document.getElementById('out3');
+  try {
+    var p = {
+      mu0: val('p3_mu0'), a: val('p3_a'), b: val('p3_b'), Dc: val('p3_Dc'), V0: val('p3_V0'),
+      V1: val('p3_V1'), V2: val('p3_V2'), tStep: val('p3_tStep'), totalTime: val('p3_total'),
+      rtol: 1e-9, atol: 1e-12
+    };
+    var r = RSF.velocityStepExperiment(p);
+    var html = '<div class="kv">' +
+      '<div class="item">直接效应 Δμ<sub>直接</sub> = <b>' + fmt(r.directEffect, 6) + '</b></div>' +
+      '<div class="item">稳态变化 Δμ<sub>稳态</sub> = <b>' + fmt(r.steadyChange, 6) + '</b></div>' +
+      '<div class="item">阶跃前稳态 μ = <b>' + fmt(r.mu[0], 6) + '</b></div>' +
+      '<div class="item">阶跃后最终 μ = <b>' + fmt(r.mu[r.mu.length - 1], 6) + '</b></div>' +
+      '</div>';
+
+    var step = Math.max(1, Math.floor(r.t.length / 50));
+    var rows = [];
+    for (var j = 0; j < r.t.length; j += step) rows.push([fmt(r.t[j], 4), fmt(r.mu[j], 6)]);
+    rows.push([fmt(r.t[r.t.length - 1], 4), fmt(r.mu[r.mu.length - 1], 6)]);
+    html += '<p class="note">μ(t) 序列（阶跃瞬间跳变，随后松弛至新稳态）：</p>';
+    html += tableHtml(['t (s)', 'μ'], rows);
+    html += '<canvas class="chart" id="chart3"></canvas>';
+    el.innerHTML = html;
+
+    var pts = [];
+    var stepP = Math.max(1, Math.floor(r.t.length / 600));
+    for (var k = 0; k < r.t.length; k += stepP) pts.push([r.t[k], r.mu[k]]);
+    pts.push([r.t[r.t.length - 1], r.mu[r.mu.length - 1]]);
+    drawChart(document.getElementById('chart3'), {
+      title: 'μ(t) — 速度阶跃直接效应与松弛',
+      xLabel: '时间 t (s)', yLabel: 'μ',
+      series: [{ points: pts, color: '#2563eb' }]
+    });
+  } catch (e) { el.innerHTML = '<pre>错误：' + esc(e.message) + '</pre>'; }
+}
+
+/* ---------- 面板 4：静态愈合 ---------- */
+function calcHealing() {
+  var el = document.getElementById('out4');
+  try {
+    var p = { mu0: val('p4_mu0'), a: 0, b: val('p4_b'), Dc: val('p4_Dc'), V0: val('p4_V0') };
+    var f = new RSF.RateStateFriction(p);
+    var theta0 = f.thetaSS(p.V0, 0);
+    var holds = [0, 1, 10, 100, 1000, 10000, 100000];
+    var mus = f.healingCurve(holds);
+    var rows = holds.map(function (h, i) {
+      return [fmt(h, 4), fmt(mus[i], 6), fmt(mus[i] - mus[0], 5)];
+    });
+    var html = '<div class="kv"><div class="item">初始状态 θ₀ = Dc/V₀ = <b>' + fmt(theta0, 4) + ' s</b></div></div>';
+    html += '<p class="note">静摩擦 μ<sub>s</sub> 随静止保持时间 Δt 的增长：</p>';
+    html += tableHtml(['静止时间 Δt (s)', 'μ<sub>s</sub>', 'Δμ<sub>s</sub>'], rows);
+    html += '<canvas class="chart" id="chart4"></canvas>';
+    el.innerHTML = html;
+
+    var hpts = [];
+    for (var k = 1; k < holds.length; k++) hpts.push([holds[k], mus[k]]);
+    drawChart(document.getElementById('chart4'), {
+      title: '静摩擦 μ_s 随静止时间的对数增长（对数时间轴）',
+      xLabel: '静止时间 Δt (s)', yLabel: 'μ_s',
+      logX: true,
+      series: [{ points: hpts, color: '#059669' }]
+    });
+  } catch (e) { el.innerHTML = '<pre>错误：' + esc(e.message) + '</pre>'; }
+}
+
+/* 初始运行一次，填充示例结果 */
+calcCore();
+calcHealing();
+</script>
+</body>
+</html>
