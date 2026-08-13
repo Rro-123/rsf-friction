@@ -133,7 +133,7 @@ const F = RSF.computeFriction('steel', 1000, 0.5).frictionForce;  // 420 N
 
 ## 在线演示
 
-👉 **在线体验（GitHub Pages）**：<https://Rro-123.github.io/rsf-friction/>
+👉 **在线体验（GitHub Pages）**：<https://rro-123.github.io/rsf-friction/>
 
 > 启用 GitHub Pages 后生效：仓库 `Settings → Pages → Source 选 main 分支`。
 
