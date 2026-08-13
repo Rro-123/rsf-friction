@@ -105,10 +105,10 @@ a − b < 0   且   k < k_crit = N·(b−a)/Dc
 
 ## 快速开始
 
-### 浏览器
+### 方式一：CDN 引入（浏览器，零安装）
 
 ```html
-<script src="rsf.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/Rro-123/rsf-friction@v1.0.0/rsf.js"></script>
 <script>
   const 结果 = RSF.computeFriction('granite', 1000, 1e-5);  // 材质、法向力(N)、速度(m/s)
   console.log(结果.frictionForce);  // 摩擦力 (N)
@@ -116,12 +116,20 @@ a − b < 0   且   k < k_crit = N·(b−a)/Dc
 </script>
 ```
 
-### Node.js
+### 方式二：npm 从 GitHub 安装
+
+```bash
+npm install github:Rro-123/rsf-friction
+```
 
 ```js
-const RSF = require('./rsf.js');
+const RSF = require('rsf-friction');
 const F = RSF.computeFriction('steel', 1000, 0.5).frictionForce;  // 420 N
 ```
+
+### 方式三：直接下载文件
+
+下载 [`rsf.js`](rsf.js) 放入项目，用 `<script src="rsf.js"></script>`（浏览器）或 `require('./rsf.js')`（Node）引入。
 
 ---
 
