@@ -265,9 +265,14 @@ export function coulombForce(mu: number, normalForce: number): number;
 // 三变量便捷接口
 // ---------------------------------------------------------------------------
 
+/** 材质类别：岩石（含 RSF 参数）/ 金属 / 聚合物 / 其他非金属。 */
+export type MaterialCategory = 'rock' | 'metal' | 'polymer' | 'other';
+
 /** 材质参数对象（自定义材质或预设材质的结构）。 */
 export interface MaterialSpec {
   name?: string;
+  /** 材质类别（预设材质附带；自定义材质可省略）。 */
+  category?: MaterialCategory;
   mu?: number;
   muS?: number;
   mu0?: number;

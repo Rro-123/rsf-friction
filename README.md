@@ -96,7 +96,7 @@ a − b < 0   且   k < k_crit = N·(b−a)/Dc
 
 - **零依赖**：单文件 UMD 模块，浏览器（`<script>`）与 Node.js（`require`）通用；
 - **三变量便捷接口** `computeFriction(材质, 法向力, 速度)`：一行代码得到摩擦力；
-- **内置 11 种材质参数表**（岩石类含 RSF 参数，工程类含库仑 μ/μ_s）；
+- **内置 62 种材质参数表**（14 种岩石含 RSF 参数，48 种工程材料含库仑 μ/μ_s，见 [`materials/材质参数表.md`](materials/材质参数表.md)）；
 - **自适应 Cash-Karp RK45 求解器**：速度阶跃直接效应、稳态摩擦、静态愈合均与解析解逐位吻合；
 - **四种状态演化律**：Dieterich 老化律、Ruina 滑移律、PRZ、Nagata；
 - 自带 **Canvas 可视化演示页**（`index.html`），直观展示锯齿形粘滑曲线；
@@ -149,7 +149,7 @@ const r = computeFriction('granite', 1000, 1e-5);   // ComputeFrictionResult
 
 ## 详细文档
 
-完整的使用说明见 **[使用指南.md](使用指南.md)**，涵盖：三变量（材质 / 压力 / 速度）到库输入的映射、库仑与 RSF 两种计算模式、内置材质参数表、嵌入仿真实验的代码示例、粘滑等进阶用法、完整 API 与注意事项。
+完整的使用说明见 **[使用指南.md](使用指南.md)**，涵盖：三变量（材质 / 压力 / 速度）到库输入的映射、库仑与 RSF 两种计算模式、[内置材质参数表](materials/材质参数表.md)、嵌入仿真实验的代码示例、粘滑等进阶用法、完整 API 与注意事项。
 
 ---
 
@@ -188,6 +188,7 @@ const r = computeFriction('granite', 1000, 1e-5);   // ComputeFrictionResult
 ├── rsf.js          # 核心库（UMD，零依赖，浏览器 & Node 通用）
 ├── index.d.ts      # TypeScript 类型定义
 ├── index.html      # 可视化演示页（含 Canvas 图表）
+├── materials/      # 内置材质参数表（材质参数表.md + materials.json）
 ├── tests/          # 自动化测试（node:test，npm test）
 ├── 使用指南.md      # 详细使用指南（三变量 → 摩擦力）
 ├── README.md       # 本文件
