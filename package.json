@@ -1,6 +1,6 @@
 {
   "name": "rsf-friction",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "速率-状态摩擦定律（Rate-and-State Friction, RSF）计算库 — 三变量（材质/压力/速度）计算摩擦力",
   "main": "rsf.js",
   "unpkg": "rsf.js",
