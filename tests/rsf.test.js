@@ -17,7 +17,7 @@ function approx(actual, expected, tol, msg) {
 // 导出结构与版本
 // ---------------------------------------------------------------------------
 test('导出结构与版本号', () => {
-  assert.equal(RSF.version, '1.2.0');
+  assert.equal(RSF.version, '1.2.1');
   assert.equal(typeof RSF.RateStateFriction, 'function');
   assert.equal(typeof RSF.SpringBlockSlider, 'function');
   assert.equal(typeof RSF.StickSlipSlider, 'function');
