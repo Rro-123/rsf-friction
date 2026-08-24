@@ -917,19 +917,36 @@
     titanium:     { name: '钛-钛（干）',         material1: '钛',     material2: '钛',     category: 'metal',   mu: 0.40, muS: 0.55 },
     magnesium:    { name: '镁-镁（干）',         material1: '镁',     material2: '镁',     category: 'metal',   mu: 0.35, muS: 0.45 },
     lead:         { name: '铅-钢（干）',         material1: '铅',     material2: '钢',     category: 'metal',   mu: 0.50, muS: 0.90 },
-    zinc:         { name: '锌-铸铁（干）',       material1: '锌',     material2: '铸铁',   category: 'metal',   mu: 0.21, muS: 0.85, note: '数据源为锌-铸铁配对（与其他金属的“-钢”基准不同）' },
+    zinc:         { name: '锌-钢（干）',         material1: '锌',     material2: '钢',     category: 'metal',   mu: 0.21, muS: 0.85 },
     stainless_steel: { name: '不锈钢-不锈钢（干）', material1: '不锈钢', material2: '不锈钢', category: 'metal', mu: 0.50, muS: 0.70 },
     tin:          { name: '锡-钢（干）',         material1: '锡',     material2: '钢',     category: 'metal',   mu: 0.40, muS: 0.60 },
     platinum:     { name: '铂-铂（干）',         material1: '铂',     material2: '铂',     category: 'metal',   mu: 0.40, muS: 0.50 },
     silver:       { name: '银-银（干）',         material1: '银',     material2: '银',     category: 'metal',   mu: 0.40, muS: 0.50 },
     gold:         { name: '金-金（干）',         material1: '金',     material2: '金',     category: 'metal',   mu: 0.40, muS: 0.50 },
     tungsten:     { name: '碳化钨-钢（干）',     material1: '碳化钨', material2: '钢',     category: 'metal',   mu: 0.45, muS: 0.55 },
+    // 金属-金属补充组合（Machinery's Handbook / StructX / eMachineShop 核对）
+    copper_copper: { name: '铜-铜（干）',        material1: '铜',     material2: '铜',     category: 'metal',   mu: 1.00, muS: 1.00 },
+    castiron_steel: { name: '铸铁-钢（干）',     material1: '铸铁',   material2: '钢',     category: 'metal',   mu: 0.23, muS: 0.40 },
     // 聚合物类（库仑模式；配对对象不明者已移除，保留条目均注明接触对）
     rubber:       { name: '橡胶-混凝土（干）',   material1: '橡胶',   material2: '混凝土', category: 'polymer', mu: 0.80, muS: 0.90 },
     rubber_wet:   { name: '橡胶-混凝土（湿）',   material1: '橡胶',   material2: '混凝土', category: 'polymer', mu: 0.25, muS: 0.30 },
     ptfe:         { name: '聚四氟乙烯(PTFE)-钢', material1: '聚四氟乙烯（PTFE）', material2: '钢', category: 'polymer', mu: 0.05, muS: 0.06 },
     nylon:        { name: '尼龙-尼龙',           material1: '尼龙',   material2: '尼龙',   category: 'polymer', mu: 0.25, muS: 0.25 },
     polyethylene: { name: '聚乙烯(PE)-钢',       material1: '聚乙烯（PE）', material2: '钢', category: 'polymer', mu: 0.20, muS: 0.20 },
+    // 聚合物补充组合（机械设计手册《各种工程用塑料的摩擦因数》/ Engineering ToolBox / GORTEF 核对）
+    pom_steel:    { name: '聚甲醛(POM)-钢',      material1: '聚甲醛（POM）', material2: '钢', category: 'polymer', mu: 0.13, muS: 0.14 },
+    pvc_steel:    { name: '聚氯乙烯(PVC)-钢',    material1: '聚氯乙烯（PVC）', material2: '钢', category: 'polymer', mu: 0.40, muS: 0.45 },
+    pvc_pvc:      { name: 'PVC-PVC',             material1: '聚氯乙烯（PVC）', material2: '聚氯乙烯（PVC）', category: 'polymer', mu: 0.40, muS: 0.50 },
+    pc_steel:     { name: '聚碳酸酯(PC)-钢',     material1: '聚碳酸酯（PC）', material2: '钢', category: 'polymer', mu: 0.53, muS: 0.60 },
+    nylon_steel:  { name: '尼龙-钢',             material1: '尼龙',   material2: '钢',     category: 'polymer', mu: 0.34, muS: 0.37 },
+    pmma_steel:   { name: '有机玻璃(PMMA)-钢',   material1: '有机玻璃（PMMA）', material2: '钢', category: 'polymer', mu: 0.45, muS: 0.45 },
+    peek_steel:   { name: '聚醚醚酮(PEEK)-钢',   material1: '聚醚醚酮（PEEK）', material2: '钢', category: 'polymer', mu: 0.25, muS: 0.35 },
+    ptfe_ptfe:    { name: 'PTFE-PTFE',           material1: '聚四氟乙烯（PTFE）', material2: '聚四氟乙烯（PTFE）', category: 'polymer', mu: 0.04, muS: 0.04 },
+    phenolic_bronze: { name: '酚醛树脂层压材-青铜', material1: '酚醛树脂层压材', material2: '青铜', category: 'polymer', mu: 0.23, muS: 0.23 },
+    rubber_steel: { name: '橡胶-钢',             material1: '橡胶',   material2: '钢',     category: 'polymer', mu: 0.60, muS: 0.70 },
+    pet_steel:    { name: '聚对苯二甲酸乙二醇酯(PET)-钢', material1: '聚对苯二甲酸乙二醇酯（PET）', material2: '钢', category: 'polymer', mu: 0.28, muS: 0.29 },
+    pvdf_steel:   { name: '聚偏二氟乙烯(PVDF)-钢', material1: '聚偏二氟乙烯（PVDF）', material2: '钢', category: 'polymer', mu: 0.25, muS: 0.33 },
+    fep_steel:    { name: '聚全氟乙丙烯(FEP)-钢', material1: '聚全氟乙丙烯（FEP）', material2: '钢', category: 'polymer', mu: 0.18, muS: 0.25 },
     // 其他非金属（库仑模式）
     glass:        { name: '玻璃-玻璃（干）',     material1: '玻璃',   material2: '玻璃',   category: 'other',   mu: 0.90, muS: 0.95 },
     wood:         { name: '木材-木材',           material1: '木材',   material2: '木材',   category: 'other',   mu: 0.30, muS: 0.40 },
@@ -943,7 +960,15 @@
     brick:        { name: '砖-木材（干）',       material1: '砖',     material2: '木材',   category: 'other',   mu: 0.50, muS: 0.60 },
     cork:         { name: '软木-钢',             material1: '软木',   material2: '钢',     category: 'other',   mu: 0.30, muS: 0.35 },
     felt:         { name: '毛毡-钢',             material1: '毛毡',   material2: '钢',     category: 'other',   mu: 0.25, muS: 0.30 },
-    silk:         { name: '丝绸-丝绸',           material1: '丝绸',   material2: '丝绸',   category: 'other',   mu: 0.30, muS: 0.40 }
+    silk:         { name: '丝绸-丝绸',           material1: '丝绸',   material2: '丝绸',   category: 'other',   mu: 0.30, muS: 0.40 },
+    // 非金属-金属/非金属补充组合（Engineering ToolBox / 机械设计手册 / Super Civil CD 核对）
+    concrete_steel: { name: '混凝土-钢（干）',   material1: '混凝土', material2: '钢',     category: 'other',   mu: 0.45, muS: 0.70 },
+    leather_steel: { name: '皮革-钢（干）',      material1: '皮革',   material2: '钢',     category: 'other',   mu: 0.40, muS: 0.50 },
+    glass_steel:  { name: '玻璃-钢（干）',       material1: '玻璃',   material2: '钢',     category: 'other',   mu: 0.45, muS: 0.60 },
+    wood_steel:   { name: '木材-钢（干）',       material1: '木材',   material2: '钢',     category: 'other',   mu: 0.28, muS: 0.40 },
+    brick_brick:  { name: '砖-砖（干）',         material1: '砖',     material2: '砖',     category: 'other',   mu: 0.65, muS: 0.65 },
+    graphite_steel: { name: '石墨-钢（干）',     material1: '石墨',   material2: '钢',     category: 'other',   mu: 0.10, muS: 0.10 },
+    leather_wood: { name: '皮革-木材（干）',     material1: '皮革',   material2: '木材',   category: 'other',   mu: 0.45, muS: 0.35 }
   };
 
   /**
