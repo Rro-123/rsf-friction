@@ -123,7 +123,7 @@ const F = RSF.computeFriction('steel', 1000, 0.5).frictionForce;  // 420 N
 ### 方式二：CDN 引入（浏览器，零安装）
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/rsf-friction@1.2.1/rsf.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/rsf-friction@1.2.2/rsf.js"></script>
 <script>
   const 结果 = RSF.computeFriction('granite', 1000, 1e-5);  // 材质、法向力(N)、速度(m/s)
   console.log(结果.frictionForce);  // 摩擦力 (N)
@@ -131,7 +131,7 @@ const F = RSF.computeFriction('steel', 1000, 0.5).frictionForce;  // 420 N
 </script>
 ```
 
-> 也可用 unpkg：`https://unpkg.com/rsf-friction@1.2.1/rsf.js`
+> 也可用 unpkg：`https://unpkg.com/rsf-friction@1.2.2/rsf.js`
 
 ### 方式三：从 GitHub 安装开发版
 
@@ -141,7 +141,7 @@ npm install github:Rro-123/rsf-friction
 
 ### 方式四：直接下载文件
 
-从 [jsDelivr](https://cdn.jsdelivr.net/npm/rsf-friction@1.2.1/rsf.js) 或 [GitHub Releases](https://github.com/Rro-123/rsf-friction/releases) 下载 [`rsf.js`](rsf.js) 放入项目，用 `<script src="rsf.js"></script>`（浏览器）或 `require('./rsf.js')`（Node）引入。
+从 [jsDelivr](https://cdn.jsdelivr.net/npm/rsf-friction@1.2.2/rsf.js) 或 [GitHub Releases](https://github.com/Rro-123/rsf-friction/releases) 下载 [`rsf.js`](rsf.js) 放入项目，用 `<script src="rsf.js"></script>`（浏览器）或 `require('./rsf.js')`（Node）引入。
 
 ### TypeScript 用户
 
