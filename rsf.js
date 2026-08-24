@@ -877,10 +877,13 @@
   // ---------------------------------------------------------------------------
   /**
    * 每种材质包含：
-   *   name     : 中文名
-   *   category : 材质类别（'rock' 岩石 / 'metal' 金属 / 'polymer' 聚合物 / 'other' 其他非金属）
-   *   mu       : 库仑动摩擦系数（滑动，教科书参考值）
-   *   muS      : 库仑静摩擦系数（静止，教科书参考值）
+   *   name       : 接触对中文名，「材质A-材质B（条件）」（干/湿）
+   *   material1  : 接触面材质 1（用于按材质检索 / 文档索引）
+   *   material2  : 接触面材质 2
+   *   category   : 材质类别（'rock' 岩石 / 'metal' 金属 / 'polymer' 聚合物 / 'other' 其他非金属）
+   *   mu         : 库仑动摩擦系数（滑动，教科书参考值）
+   *   muS        : 库仑静摩擦系数（静止，教科书参考值）
+   *   note       : 可选备注（如数据源的特定配对）
    *   岩石类额外含 RSF 参数 mu0 / a / b / Dc / V0（实验室标定典型值）。
    *
    * 说明：库仑 μ / μ_s 为常见工程材料干摩擦的教科书量级参考值；
@@ -888,72 +891,59 @@
    * 实际仿真应优先用实测/标定值替换这些参考值。
    */
   var materials = {
-    // 岩石类（含 RSF 参数，computeFriction 自动走 RSF 模式）
-    granite:      { name: '花岗岩（岩石）',      category: 'rock',    mu: 0.60, muS: 0.65, mu0: 0.60, a: 0.008, b: 0.012, Dc: 5e-6, V0: 1e-6 },
-    sandstone:    { name: '砂岩（岩石）',        category: 'rock',    mu: 0.55, muS: 0.60, mu0: 0.60, a: 0.005, b: 0.010, Dc: 1e-5, V0: 1e-6 },
-    limestone:    { name: '石灰岩（岩石）',      category: 'rock',    mu: 0.50, muS: 0.55, mu0: 0.55, a: 0.006, b: 0.009, Dc: 1e-5, V0: 1e-6 },
-    gabbro:       { name: '辉长岩（岩石）',      category: 'rock',    mu: 0.62, muS: 0.68, mu0: 0.62, a: 0.008, b: 0.013, Dc: 1e-5, V0: 1e-6 },
-    basalt:       { name: '玄武岩（岩石）',      category: 'rock',    mu: 0.60, muS: 0.65, mu0: 0.60, a: 0.006, b: 0.011, Dc: 1e-5, V0: 1e-6 },
-    marble:       { name: '大理岩（岩石）',      category: 'rock',    mu: 0.55, muS: 0.60, mu0: 0.58, a: 0.007, b: 0.010, Dc: 1e-5, V0: 1e-6 },
-    quartzite:    { name: '石英岩（岩石）',      category: 'rock',    mu: 0.62, muS: 0.68, mu0: 0.62, a: 0.008, b: 0.012, Dc: 5e-6, V0: 1e-6 },
-    serpentinite: { name: '蛇纹岩（岩石）',      category: 'rock',    mu: 0.40, muS: 0.45, mu0: 0.40, a: 0.006, b: 0.014, Dc: 1e-5, V0: 1e-6 },
-    shale:        { name: '页岩（岩石）',        category: 'rock',    mu: 0.42, muS: 0.50, mu0: 0.45, a: 0.005, b: 0.010, Dc: 1e-5, V0: 1e-6 },
-    dolomite:     { name: '白云岩（岩石）',      category: 'rock',    mu: 0.55, muS: 0.60, mu0: 0.58, a: 0.006, b: 0.010, Dc: 1e-5, V0: 1e-6 },
-    andesite:     { name: '安山岩（岩石）',      category: 'rock',    mu: 0.60, muS: 0.65, mu0: 0.60, a: 0.006, b: 0.011, Dc: 1e-5, V0: 1e-6 },
-    gneiss:       { name: '片麻岩（岩石）',      category: 'rock',    mu: 0.62, muS: 0.68, mu0: 0.62, a: 0.008, b: 0.012, Dc: 1e-5, V0: 1e-6 },
-    slate:        { name: '板岩（岩石）',        category: 'rock',    mu: 0.45, muS: 0.50, mu0: 0.48, a: 0.005, b: 0.010, Dc: 1e-5, V0: 1e-6 },
-    talc:         { name: '滑石（岩石）',        category: 'rock',    mu: 0.15, muS: 0.20, mu0: 0.16, a: 0.005, b: 0.012, Dc: 1e-5, V0: 1e-6 },
+    // 岩石类（含 RSF 参数，computeFriction 自动走 RSF 模式；数值为同种岩石对磨实验值）
+    granite:      { name: '花岗岩-花岗岩',         material1: '花岗岩',   material2: '花岗岩',   category: 'rock',    mu: 0.60, muS: 0.65, mu0: 0.60, a: 0.008, b: 0.012, Dc: 5e-6, V0: 1e-6 },
+    sandstone:    { name: '砂岩-砂岩',             material1: '砂岩',     material2: '砂岩',     category: 'rock',    mu: 0.55, muS: 0.60, mu0: 0.60, a: 0.005, b: 0.010, Dc: 1e-5, V0: 1e-6 },
+    limestone:    { name: '石灰岩-石灰岩',         material1: '石灰岩',   material2: '石灰岩',   category: 'rock',    mu: 0.50, muS: 0.55, mu0: 0.55, a: 0.006, b: 0.009, Dc: 1e-5, V0: 1e-6 },
+    gabbro:       { name: '辉长岩-辉长岩',         material1: '辉长岩',   material2: '辉长岩',   category: 'rock',    mu: 0.62, muS: 0.68, mu0: 0.62, a: 0.008, b: 0.013, Dc: 1e-5, V0: 1e-6 },
+    basalt:       { name: '玄武岩-玄武岩',         material1: '玄武岩',   material2: '玄武岩',   category: 'rock',    mu: 0.60, muS: 0.65, mu0: 0.60, a: 0.006, b: 0.011, Dc: 1e-5, V0: 1e-6 },
+    marble:       { name: '大理岩-大理岩',         material1: '大理岩',   material2: '大理岩',   category: 'rock',    mu: 0.55, muS: 0.60, mu0: 0.58, a: 0.007, b: 0.010, Dc: 1e-5, V0: 1e-6 },
+    quartzite:    { name: '石英岩-石英岩',         material1: '石英岩',   material2: '石英岩',   category: 'rock',    mu: 0.62, muS: 0.68, mu0: 0.62, a: 0.008, b: 0.012, Dc: 5e-6, V0: 1e-6 },
+    serpentinite: { name: '蛇纹岩-蛇纹岩',         material1: '蛇纹岩',   material2: '蛇纹岩',   category: 'rock',    mu: 0.40, muS: 0.45, mu0: 0.40, a: 0.006, b: 0.014, Dc: 1e-5, V0: 1e-6 },
+    shale:        { name: '页岩-页岩',             material1: '页岩',     material2: '页岩',     category: 'rock',    mu: 0.42, muS: 0.50, mu0: 0.45, a: 0.005, b: 0.010, Dc: 1e-5, V0: 1e-6 },
+    dolomite:     { name: '白云岩-白云岩',         material1: '白云岩',   material2: '白云岩',   category: 'rock',    mu: 0.55, muS: 0.60, mu0: 0.58, a: 0.006, b: 0.010, Dc: 1e-5, V0: 1e-6 },
+    andesite:     { name: '安山岩-安山岩',         material1: '安山岩',   material2: '安山岩',   category: 'rock',    mu: 0.60, muS: 0.65, mu0: 0.60, a: 0.006, b: 0.011, Dc: 1e-5, V0: 1e-6 },
+    gneiss:       { name: '片麻岩-片麻岩',         material1: '片麻岩',   material2: '片麻岩',   category: 'rock',    mu: 0.62, muS: 0.68, mu0: 0.62, a: 0.008, b: 0.012, Dc: 1e-5, V0: 1e-6 },
+    slate:        { name: '板岩-板岩',             material1: '板岩',     material2: '板岩',     category: 'rock',    mu: 0.45, muS: 0.50, mu0: 0.48, a: 0.005, b: 0.010, Dc: 1e-5, V0: 1e-6 },
+    talc:         { name: '滑石-滑石',             material1: '滑石',     material2: '滑石',     category: 'rock',    mu: 0.15, muS: 0.20, mu0: 0.16, a: 0.005, b: 0.012, Dc: 1e-5, V0: 1e-6 },
     // 金属类（库仑模式）
-    steel:        { name: '钢-钢（干）',         category: 'metal',   mu: 0.42, muS: 0.60 },
-    aluminum:     { name: '铝-钢（干）',         category: 'metal',   mu: 0.45, muS: 0.55 },
-    castiron:     { name: '铸铁-铸铁（干）',     category: 'metal',   mu: 0.20, muS: 0.30 },
-    copper:       { name: '铜-钢（干）',         category: 'metal',   mu: 0.36, muS: 0.53 },
-    brass:        { name: '黄铜-钢（干）',       category: 'metal',   mu: 0.44, muS: 0.51 },
-    bronze:       { name: '青铜-钢（干）',       category: 'metal',   mu: 0.20, muS: 0.25 },
-    nickel:       { name: '镍-钢（干）',         category: 'metal',   mu: 0.35, muS: 0.50 },
-    titanium:     { name: '钛-钛（干）',         category: 'metal',   mu: 0.40, muS: 0.55 },
-    magnesium:    { name: '镁-镁（干）',         category: 'metal',   mu: 0.35, muS: 0.45 },
-    lead:         { name: '铅-钢（干）',         category: 'metal',   mu: 0.50, muS: 0.90 },
-    zinc:         { name: '锌-铸铁（干）',       category: 'metal',   mu: 0.21, muS: 0.85 },
-    stainless_steel: { name: '不锈钢-不锈钢（干）', category: 'metal', mu: 0.50, muS: 0.70 },
-    tin:          { name: '锡-钢（干）',         category: 'metal',   mu: 0.40, muS: 0.60 },
-    platinum:     { name: '铂-铂（干）',         category: 'metal',   mu: 0.40, muS: 0.50 },
-    silver:       { name: '银-银（干）',         category: 'metal',   mu: 0.40, muS: 0.50 },
-    gold:         { name: '金-金（干）',         category: 'metal',   mu: 0.40, muS: 0.50 },
-    tungsten:     { name: '碳化钨-钢（干）',     category: 'metal',   mu: 0.45, muS: 0.55 },
-    // 聚合物类（库仑模式）
-    rubber:       { name: '橡胶-混凝土（干）',   category: 'polymer', mu: 0.80, muS: 0.90 },
-    rubber_wet:   { name: '橡胶-混凝土（湿）',   category: 'polymer', mu: 0.25, muS: 0.30 },
-    ptfe:         { name: '聚四氟乙烯(PTFE)-钢', category: 'polymer', mu: 0.05, muS: 0.06 },
-    nylon:        { name: '尼龙-尼龙',           category: 'polymer', mu: 0.25, muS: 0.25 },
-    polyethylene: { name: '聚乙烯(PE)-钢',       category: 'polymer', mu: 0.20, muS: 0.20 },
-    polypropylene:{ name: '聚丙烯(PP)',          category: 'polymer', mu: 0.25, muS: 0.25 },
-    pvc:          { name: '聚氯乙烯(PVC)',       category: 'polymer', mu: 0.40, muS: 0.45 },
-    acrylic:      { name: '有机玻璃(PMMA)',      category: 'polymer', mu: 0.40, muS: 0.50 },
-    polycarbonate:{ name: '聚碳酸酯(PC)',        category: 'polymer', mu: 0.35, muS: 0.40 },
-    abs:          { name: 'ABS 塑料',            category: 'polymer', mu: 0.35, muS: 0.40 },
-    pom:          { name: '聚甲醛(POM/赛钢)',    category: 'polymer', mu: 0.20, muS: 0.20 },
-    peek:         { name: '聚醚醚酮(PEEK)',      category: 'polymer', mu: 0.40, muS: 0.45 },
-    epoxy:        { name: '环氧树脂',             category: 'polymer', mu: 0.40, muS: 0.50 },
-    polyurethane: { name: '聚氨酯(PU)',          category: 'polymer', mu: 0.50, muS: 0.60 },
-    silicone:     { name: '硅橡胶',               category: 'polymer', mu: 0.40, muS: 0.50 },
-    phenolic:     { name: '酚醛树脂',             category: 'polymer', mu: 0.35, muS: 0.45 },
-    polystyrene:  { name: '聚苯乙烯(PS)',        category: 'polymer', mu: 0.35, muS: 0.45 },
+    steel:        { name: '钢-钢（干）',         material1: '钢',     material2: '钢',     category: 'metal',   mu: 0.42, muS: 0.60 },
+    aluminum:     { name: '铝-钢（干）',         material1: '铝',     material2: '钢',     category: 'metal',   mu: 0.45, muS: 0.55 },
+    castiron:     { name: '铸铁-铸铁（干）',     material1: '铸铁',   material2: '铸铁',   category: 'metal',   mu: 0.20, muS: 0.30 },
+    copper:       { name: '铜-钢（干）',         material1: '铜',     material2: '钢',     category: 'metal',   mu: 0.36, muS: 0.53 },
+    brass:        { name: '黄铜-钢（干）',       material1: '黄铜',   material2: '钢',     category: 'metal',   mu: 0.44, muS: 0.51 },
+    bronze:       { name: '青铜-钢（干）',       material1: '青铜',   material2: '钢',     category: 'metal',   mu: 0.20, muS: 0.25 },
+    nickel:       { name: '镍-钢（干）',         material1: '镍',     material2: '钢',     category: 'metal',   mu: 0.35, muS: 0.50 },
+    titanium:     { name: '钛-钛（干）',         material1: '钛',     material2: '钛',     category: 'metal',   mu: 0.40, muS: 0.55 },
+    magnesium:    { name: '镁-镁（干）',         material1: '镁',     material2: '镁',     category: 'metal',   mu: 0.35, muS: 0.45 },
+    lead:         { name: '铅-钢（干）',         material1: '铅',     material2: '钢',     category: 'metal',   mu: 0.50, muS: 0.90 },
+    zinc:         { name: '锌-铸铁（干）',       material1: '锌',     material2: '铸铁',   category: 'metal',   mu: 0.21, muS: 0.85, note: '数据源为锌-铸铁配对（与其他金属的“-钢”基准不同）' },
+    stainless_steel: { name: '不锈钢-不锈钢（干）', material1: '不锈钢', material2: '不锈钢', category: 'metal', mu: 0.50, muS: 0.70 },
+    tin:          { name: '锡-钢（干）',         material1: '锡',     material2: '钢',     category: 'metal',   mu: 0.40, muS: 0.60 },
+    platinum:     { name: '铂-铂（干）',         material1: '铂',     material2: '铂',     category: 'metal',   mu: 0.40, muS: 0.50 },
+    silver:       { name: '银-银（干）',         material1: '银',     material2: '银',     category: 'metal',   mu: 0.40, muS: 0.50 },
+    gold:         { name: '金-金（干）',         material1: '金',     material2: '金',     category: 'metal',   mu: 0.40, muS: 0.50 },
+    tungsten:     { name: '碳化钨-钢（干）',     material1: '碳化钨', material2: '钢',     category: 'metal',   mu: 0.45, muS: 0.55 },
+    // 聚合物类（库仑模式；配对对象不明者已移除，保留条目均注明接触对）
+    rubber:       { name: '橡胶-混凝土（干）',   material1: '橡胶',   material2: '混凝土', category: 'polymer', mu: 0.80, muS: 0.90 },
+    rubber_wet:   { name: '橡胶-混凝土（湿）',   material1: '橡胶',   material2: '混凝土', category: 'polymer', mu: 0.25, muS: 0.30 },
+    ptfe:         { name: '聚四氟乙烯(PTFE)-钢', material1: '聚四氟乙烯（PTFE）', material2: '钢', category: 'polymer', mu: 0.05, muS: 0.06 },
+    nylon:        { name: '尼龙-尼龙',           material1: '尼龙',   material2: '尼龙',   category: 'polymer', mu: 0.25, muS: 0.25 },
+    polyethylene: { name: '聚乙烯(PE)-钢',       material1: '聚乙烯（PE）', material2: '钢', category: 'polymer', mu: 0.20, muS: 0.20 },
     // 其他非金属（库仑模式）
-    glass:        { name: '玻璃-玻璃（干）',     category: 'other',   mu: 0.90, muS: 0.95 },
-    wood:         { name: '木材-木材',           category: 'other',   mu: 0.30, muS: 0.40 },
-    concrete:     { name: '混凝土-混凝土',       category: 'other',   mu: 0.75, muS: 1.00 },
-    ice:          { name: '冰-钢',               category: 'other',   mu: 0.03, muS: 0.10 },
-    leather:      { name: '皮革-金属（干）',     category: 'other',   mu: 0.40, muS: 0.60 },
-    paper:        { name: '纸-纸',               category: 'other',   mu: 0.30, muS: 0.50 },
-    graphite:     { name: '石墨-石墨',           category: 'other',   mu: 0.10, muS: 0.10 },
-    diamond:      { name: '钻石-钻石',           category: 'other',   mu: 0.10, muS: 0.10 },
-    ceramic:      { name: '陶瓷(氧化铝)-钢',     category: 'other',   mu: 0.45, muS: 0.55 },
-    asphalt:      { name: '沥青路面',             category: 'other',   mu: 0.80, muS: 0.90 },
-    brick:        { name: '砖-木（干）',         category: 'other',   mu: 0.50, muS: 0.60 },
-    cork:         { name: '软木-钢',             category: 'other',   mu: 0.30, muS: 0.35 },
-    felt:         { name: '毛毡-钢',             category: 'other',   mu: 0.25, muS: 0.30 },
-    silk:         { name: '丝绸-丝绸',           category: 'other',   mu: 0.30, muS: 0.40 }
+    glass:        { name: '玻璃-玻璃（干）',     material1: '玻璃',   material2: '玻璃',   category: 'other',   mu: 0.90, muS: 0.95 },
+    wood:         { name: '木材-木材',           material1: '木材',   material2: '木材',   category: 'other',   mu: 0.30, muS: 0.40 },
+    concrete:     { name: '混凝土-混凝土',       material1: '混凝土', material2: '混凝土', category: 'other',   mu: 0.75, muS: 1.00 },
+    ice:          { name: '冰-钢',               material1: '冰',     material2: '钢',     category: 'other',   mu: 0.03, muS: 0.10 },
+    paper:        { name: '纸-纸',               material1: '纸',     material2: '纸',     category: 'other',   mu: 0.30, muS: 0.50 },
+    graphite:     { name: '石墨-石墨',           material1: '石墨',   material2: '石墨',   category: 'other',   mu: 0.10, muS: 0.10 },
+    diamond:      { name: '钻石-钻石',           material1: '钻石',   material2: '钻石',   category: 'other',   mu: 0.10, muS: 0.10 },
+    ceramic:      { name: '陶瓷(氧化铝)-钢',     material1: '陶瓷（氧化铝）', material2: '钢', category: 'other', mu: 0.45, muS: 0.55 },
+    asphalt:      { name: '轮胎-沥青路面（干）', material1: '橡胶轮胎', material2: '沥青路面', category: 'other', mu: 0.80, muS: 0.90, note: '经典橡胶轮胎-沥青路面数据' },
+    brick:        { name: '砖-木材（干）',       material1: '砖',     material2: '木材',   category: 'other',   mu: 0.50, muS: 0.60 },
+    cork:         { name: '软木-钢',             material1: '软木',   material2: '钢',     category: 'other',   mu: 0.30, muS: 0.35 },
+    felt:         { name: '毛毡-钢',             material1: '毛毡',   material2: '钢',     category: 'other',   mu: 0.25, muS: 0.30 },
+    silk:         { name: '丝绸-丝绸',           material1: '丝绸',   material2: '丝绸',   category: 'other',   mu: 0.30, muS: 0.40 }
   };
 
   /**

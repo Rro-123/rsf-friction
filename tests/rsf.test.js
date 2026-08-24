@@ -164,15 +164,29 @@ test('makeVelocityFunction：支持数字 / 函数 / 分段数组', () => {
 // ---------------------------------------------------------------------------
 // 内置材质表完整性
 // ---------------------------------------------------------------------------
-test('内置材质表：至少 62 种，且逐一可被 computeFriction 计算', () => {
+test('内置材质表：至少 49 种接触对，且逐一可被 computeFriction 计算', () => {
   const keys = Object.keys(RSF.materials);
-  assert.ok(keys.length >= 62, `材质数应 ≥ 62，实际 ${keys.length}`);
+  assert.ok(keys.length >= 49, `材质接触对数应 ≥ 49，实际 ${keys.length}`);
   for (const k of keys) {
     const m = RSF.materials[k];
+    assert.ok(typeof m.material1 === 'string' && m.material1.length > 0, `材质 ${k} 的 material1 应为非空字符串`);
+    assert.ok(typeof m.material2 === 'string' && m.material2.length > 0, `材质 ${k} 的 material2 应为非空字符串`);
     const v = m.mu0 != null ? 1e-5 : 0.5;   // 岩石走 RSF，工程材料走库仑
     const r = RSF.computeFriction(k, 1000, v);
     assert.ok(Number.isFinite(r.mu), `材质 ${k} 的 μ 应为有限值`);
     assert.ok(Number.isFinite(r.frictionForce), `材质 ${k} 的摩擦力应为有限值`);
     if (m.mu0 != null) assert.equal(r.mode, 'rsf', `岩石类 ${k} 应走 RSF 模式`);
+  }
+});
+
+test('materials.json 与 RSF.materials 完全一致', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const json = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'materials', 'materials.json'), 'utf8'));
+  const jsKeys = Object.keys(RSF.materials);
+  const jsonKeys = Object.keys(json).filter(k => !k.startsWith('_'));
+  assert.deepStrictEqual([...jsKeys].sort(), [...jsonKeys].sort(), '材质键集合应一致');
+  for (const k of jsKeys) {
+    assert.deepStrictEqual(json[k], RSF.materials[k], `材质 ${k} 的参数应与 rsf.js 一致`);
   }
 });
