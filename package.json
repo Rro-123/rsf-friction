@@ -6,8 +6,32 @@
   "types": "index.d.ts",
   "unpkg": "rsf.js",
   "jsdelivr": "rsf.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "require": "./rsf.js",
+      "default": "./rsf.js"
+    },
+    "./materials/*.json": "./materials/*.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "rsf.js",
+    "index.d.ts",
+    "index.html",
+    "materials/",
+    "使用指南.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=14"
+  },
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "prepublishOnly": "node --test",
+    "pack:check": "npm pack --dry-run"
   },
   "keywords": [
     "friction",
@@ -15,10 +39,15 @@
     "stick-slip",
     "tribology",
     "physics",
-    "rsf"
+    "rsf",
+    "earthquake"
   ],
   "author": "Rro-123",
   "license": "MIT",
+  "homepage": "https://rro-123.github.io/rsf-friction/",
+  "bugs": {
+    "url": "https://github.com/Rro-123/rsf-friction/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Rro-123/rsf-friction.git"
