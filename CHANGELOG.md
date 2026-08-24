@@ -2,6 +2,14 @@
 
 本项目版本遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [1.3.0] - 2026-08-24
+
+### 变更（键名规则统一，破坏性）
+- **材质键名统一为「接触对」规则**：自配对（同种材料自接触，如 钢-钢、花岗岩-花岗岩、铜-铜）用**单名键**（`steel`、`granite`、`copper`）；异材质用「**主材质_副材质**」成对键名（`aluminum_steel`、`pom_steel`）。特例 `stainless_steel`（不锈钢-不锈钢）单名中的下划线属**材质名本身**（stainless steel），非成对连接符。
+- 此前混杂的单名/成对名统一，共重命名 **23 条**：`aluminum`→`aluminum_steel`、`copper`→铜-铜、原铜-钢改 `copper_steel`、`brass`→`brass_steel`、`bronze`→`bronze_steel`、`nickel`→`nickel_steel`、`lead`→`lead_steel`、`zinc`→`zinc_steel`、`tin`→`tin_steel`、`tungsten`→`tungsten_steel`、`rubber`→`rubber_concrete`、`rubber_wet`→`rubber_concrete_wet`、`ptfe`→PTFE-PTFE、原 PTFE-钢改 `ptfe_steel`、`polyethylene`→`pe_steel`、`pvc_pvc`→`pvc`、`ptfe_ptfe`→`ptfe`、`ice`→`ice_steel`、`ceramic`→`ceramic_steel`、`asphalt`→`tire_asphalt`、`brick`→砖-砖、原砖-木材改 `brick_wood`、`cork`→`cork_steel`、`felt`→`felt_steel`。
+- **⚠️ 破坏性变更**：`computeFriction`/`RSF.materials` 的旧键名（如 `copper`、`aluminum`、`ptfe`、`brick`、`rubber`、`ice` 等）含义已调整或改写，请按 `docs/materials-table.md`「怎么读这张表」的键名规则迁移到新键名。
+- `docs/materials-table.md`、`README.md`、`docs/guide.md` 均补充键名规则说明；`materials.json` 键名同步更新。
+
 ## [1.2.3] - 2026-08-24
 
 ### 新增

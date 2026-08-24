@@ -101,6 +101,7 @@ a − b < 0   且   k < k_crit = N·(b−a)/Dc
 - **四种状态演化律**：Dieterich 老化律、Ruina 滑移律、PRZ、Nagata；
 - 自带 **Canvas 可视化演示页**（[`demo/index.html`](demo/index.html)），直观展示锯齿形粘滑曲线；
 - **TypeScript 类型定义**：附带 [`index.d.ts`](index.d.ts)，TS 项目开箱即用类型提示；
+- **键名即接触对**：`computeFriction(材质, ...)` 的材质键名——自配对（钢-钢、花岗岩-花岗岩）用单名（`steel`、`granite`），异材质用「主材质_副材质」成对键名（`aluminum_steel`、`pom_steel`）；特例 `stainless_steel`（不锈钢-不锈钢）单名含下划线属材质名本身；
 - **自动化测试**：内置 `node:test` 测试套件（`npm test`），核心物理关系与解析解逐位吻合。
 
 ---
@@ -123,7 +124,7 @@ const F = RSF.computeFriction('steel', 1000, 0.5).frictionForce;  // 420 N
 ### 方式二：CDN 引入（浏览器，零安装）
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/rsf-friction@1.2.3/rsf.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/rsf-friction@1.3.0/rsf.js"></script>
 <script>
   const 结果 = RSF.computeFriction('granite', 1000, 1e-5);  // 材质、法向力(N)、速度(m/s)
   console.log(结果.frictionForce);  // 摩擦力 (N)
@@ -131,7 +132,7 @@ const F = RSF.computeFriction('steel', 1000, 0.5).frictionForce;  // 420 N
 </script>
 ```
 
-> 也可用 unpkg：`https://unpkg.com/rsf-friction@1.2.3/rsf.js`
+> 也可用 unpkg：`https://unpkg.com/rsf-friction@1.3.0/rsf.js`
 
 ### 方式三：从 GitHub 安装开发版
 
@@ -141,7 +142,7 @@ npm install github:Rro-123/rsf-friction
 
 ### 方式四：直接下载文件
 
-从 [jsDelivr](https://cdn.jsdelivr.net/npm/rsf-friction@1.2.3/rsf.js) 或 [GitHub Releases](https://github.com/Rro-123/rsf-friction/releases) 下载 [`rsf.js`](rsf.js) 放入项目，用 `<script src="rsf.js"></script>`（浏览器）或 `require('./rsf.js')`（Node）引入。
+从 [jsDelivr](https://cdn.jsdelivr.net/npm/rsf-friction@1.3.0/rsf.js) 或 [GitHub Releases](https://github.com/Rro-123/rsf-friction/releases) 下载 [`rsf.js`](rsf.js) 放入项目，用 `<script src="rsf.js"></script>`（浏览器）或 `require('./rsf.js')`（Node）引入。
 
 ### TypeScript 用户
 

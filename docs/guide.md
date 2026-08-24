@@ -135,6 +135,12 @@ const 快 = RSF.computeFriction('granite', 1000, 1e-4).frictionForce; // 581.6 N
 
 在代码中可通过 `RSF.materials` 或 `Object.keys(RSF.materials)` 遍历全部材质。
 
+**键名（key）规则**：`computeFriction`/`RSF.materials` 的键名即为接触对标识——
+- **自配对**（同种材料自接触，如 钢-钢、花岗岩-花岗岩、铜-铜）用**单名键**：`steel`、`granite`、`copper`；
+- **异材质**（两个不同材料，如 铝-钢、聚甲醛-钢）用「**主材质_副材质**」成对键名：`aluminum_steel`、`pom_steel`；
+- 特例：`stainless_steel`（不锈钢-不锈钢）的单名含下划线，属**材质名本身**（不锈钢 = stainless steel），并非成对连接符；
+- `name` 字段是人类可读的接触面对描述（如「铝-钢（干）」），**键名才是传给 API 的值**，二者不要混淆。详见 [材质参数表.md](materials-table.md)「怎么读这张表」。
+
 ### 如何修改 / 新增材质
 
 #### 方式一：运行时传入自定义材质（推荐，不改库）
