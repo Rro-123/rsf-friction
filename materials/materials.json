@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "version": "1.2.2",
+    "version": "1.2.3",
     "description": "rsf-friction 内置材质参数表（与 rsf.js 中 RSF.materials 保持一致）",
     "pairing": "每条记录均为一对接触材质（material1 × material2），摩擦系数属于接触面而非单一材质；自配对（如钢-钢）表示同种材料相互接触；岩石数据为同种岩石对磨实验值。",
     "unit": {

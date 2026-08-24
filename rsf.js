@@ -1061,6 +1061,6 @@
     materials: materials,
     computeFriction: computeFriction,
     presets: presets,
-    version: '1.2.2'
+    version: '1.2.3'
   };
 }));
