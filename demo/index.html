@@ -22,6 +22,11 @@
   header h1 { margin: 0 0 6px; font-size: 24px; }
   header p { margin: 0; opacity: .9; font-size: 14px; max-width: 900px; }
   main { max-width: 980px; margin: 0 auto; padding: 20px 16px 60px; }
+  .site-footer {
+    max-width: 980px; margin: 0 auto; padding: 4px 16px 40px;
+    font-size: 12.5px; color: var(--muted); text-align: center;
+  }
+  .site-footer a { color: var(--accent); text-decoration: none; }
   .panel {
     background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
     margin-bottom: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.05);
@@ -199,10 +204,20 @@
 
 </main>
 
+<footer class="site-footer">
+  速率-状态摩擦定律 (RSF) 计算库 · 内置材质表 v<span id="rsf-version"></span>
+  &nbsp;|&nbsp; <a href="https://github.com/Rro-123/rsf-friction" target="_blank" rel="noopener">GitHub</a>
+  &nbsp;·&nbsp; <a href="https://www.npmjs.com/package/rsf-friction" target="_blank" rel="noopener">npm</a>
+</footer>
+
 <script src="../rsf.js"></script>
 <script>
 'use strict';
 var RSF = window.RSF;
+
+/* 页脚版本号：跟随 rsf.js 的 RSF.version（未来 bump 版本时自动更新） */
+var verEl = document.getElementById('rsf-version');
+if (verEl) verEl.textContent = RSF.version;
 
 /* ---------- 工具 ---------- */
 function val(id) { return parseFloat(document.getElementById(id).value); }
