@@ -126,10 +126,10 @@ const 快 = RSF.computeFriction('granite', 1000, 1e-4).frictionForce; // 581.6 N
 
 ## 四、内置材质参数表
 
-库内置了 **62 种材质**的参考参数（14 种岩石含 RSF 参数，48 种工程材料含库仑 `μ/μ_s`）。完整参数表已拆分为独立文件（位于 `materials/` 目录）：
+库内置了 **62 种材质**的参考参数（14 种岩石含 RSF 参数，48 种工程材料含库仑 `μ/μ_s`）。完整参数表已拆分为独立文件：
 
-- **[材质参数表.md](materials/材质参数表.md)** — 分类表格 + 数据来源与免责声明（可读文档）
-- **[materials.json](materials/materials.json)** — 机器可读数据文件（与 `RSF.materials` 一致）
+- **[材质参数表.md](materials-table.md)** — 分类表格 + 数据来源与免责声明（可读文档，位于 `docs/`）
+- **[materials.json](../materials/materials.json)** — 机器可读数据文件（与 `RSF.materials` 一致，位于 `materials/`）
 
 > ⚠️ 库仑 `μ/μ_s` 为干摩擦教科书/工程手册量级参考值，RSF 参数（`mu0/a/b/Dc/V0`）为岩石摩擦实验典型量级；正式仿真请用实测/标定值替换。PTFE、冰、石墨、钻石等极低摩擦材料适合做「减小摩擦」的对比实验。
 
@@ -162,7 +162,7 @@ RSF.computeFriction('我的材质', 1000, 0.5);
    - **岩石类**需提供 `name / category: 'rock' / mu / muS / mu0 / a / b / Dc / V0`；
    - **工程材料**只需 `name / category / mu / muS`（category 可取 `metal` / `polymer` / `other`）。
 2. 同步更新 `materials/materials.json`（保持与 `RSF.materials` 一致）。
-3. 同步更新 `materials/材质参数表.md` 中对应的分类表格。
+3. 同步更新 [`docs/materials-table.md`](materials-table.md) 中对应的分类表格。
 
 > 字段约定：`mu` 动摩擦系数、`muS` 静摩擦系数、`mu0` 参考摩擦系数、`a`/`b` 直接/演化效应系数、`Dc` 临界滑移距离（m）、`V0` 参考速度（m/s）。单位均为 SI。
 
@@ -235,7 +235,7 @@ function 摩擦力矢量(材质, 法向力, 速度v) {
 
 ## 六、进阶：体现粘滑等物理现象
 
-如果仿真要体现**粘滑（stick-slip）**、**速度阶跃直接效应**、**静态愈合**，使用库的更底层接口（详见 `index.html` 演示页）：
+如果仿真要体现**粘滑（stick-slip）**、**速度阶跃直接效应**、**静态愈合**，使用库的更底层接口（详见 [`demo/index.html`](../demo/index.html) 演示页）：
 
 | 现象 | 接口 | 说明 |
 |---|---|---|

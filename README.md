@@ -96,10 +96,10 @@ a − b < 0   且   k < k_crit = N·(b−a)/Dc
 
 - **零依赖**：单文件 UMD 模块，浏览器（`<script>`）与 Node.js（`require`）通用；
 - **三变量便捷接口** `computeFriction(材质, 法向力, 速度)`：一行代码得到摩擦力；
-- **内置 62 种材质参数表**（14 种岩石含 RSF 参数，48 种工程材料含库仑 μ/μ_s，见 [`materials/材质参数表.md`](materials/材质参数表.md)）；
+- **内置 62 种材质参数表**（14 种岩石含 RSF 参数，48 种工程材料含库仑 μ/μ_s，见 [`docs/materials-table.md`](docs/materials-table.md)）；
 - **自适应 Cash-Karp RK45 求解器**：速度阶跃直接效应、稳态摩擦、静态愈合均与解析解逐位吻合；
 - **四种状态演化律**：Dieterich 老化律、Ruina 滑移律、PRZ、Nagata；
-- 自带 **Canvas 可视化演示页**（`index.html`），直观展示锯齿形粘滑曲线；
+- 自带 **Canvas 可视化演示页**（[`demo/index.html`](demo/index.html)），直观展示锯齿形粘滑曲线；
 - **TypeScript 类型定义**：附带 [`index.d.ts`](index.d.ts)，TS 项目开箱即用类型提示；
 - **自动化测试**：内置 `node:test` 测试套件（`npm test`），核心物理关系与解析解逐位吻合。
 
@@ -159,17 +159,17 @@ const r = computeFriction('granite', 1000, 1e-5);   // ComputeFrictionResult
 
 ## 详细文档
 
-完整的使用说明见 **[使用指南.md](使用指南.md)**，涵盖：三变量（材质 / 压力 / 速度）到库输入的映射、库仑与 RSF 两种计算模式、[内置材质参数表](materials/材质参数表.md)、嵌入仿真实验的代码示例、粘滑等进阶用法、完整 API 与注意事项。
+完整的使用说明见 **[docs/guide.md](docs/guide.md)**，涵盖：三变量（材质 / 压力 / 速度）到库输入的映射、库仑与 RSF 两种计算模式、[内置材质参数表](docs/materials-table.md)、嵌入仿真实验的代码示例、粘滑等进阶用法、完整 API 与注意事项。
 
 ---
 
 ## 在线演示
 
-👉 **在线体验（GitHub Pages）**：<https://rro-123.github.io/rsf-friction/>
+👉 **在线体验（GitHub Pages）**：<https://rro-123.github.io/rsf-friction/>（自动跳转至演示页）
 
-> 启用 GitHub Pages 后生效：仓库 `Settings → Pages → Source 选 main 分支`。
+> 启用 GitHub Pages 后生效：仓库 `Settings → Pages → Source 选 main 分支`（根目录 `index.html` 为跳转入口，实际演示页位于 [`demo/index.html`](demo/index.html)）。
 
-本地使用：直接打开 [`index.html`](index.html) 即可，包含四个面板：
+本地使用：直接打开 [`demo/index.html`](demo/index.html) 即可，包含四个面板：
 
 1. **核心摩擦计算器** — 三变量 → μ、F（附 μ_ss(V) 曲线）；
 2. **弹簧-滑块粘滑仿真** — 稳定性判据、滑移事件表、μ(t) 锯齿曲线、V(t) 尖峰曲线；
@@ -197,10 +197,11 @@ const r = computeFriction('granite', 1000, 1e-5);   // ComputeFrictionResult
 ```
 ├── rsf.js          # 核心库（UMD，零依赖，浏览器 & Node 通用）
 ├── index.d.ts      # TypeScript 类型定义
-├── index.html      # 可视化演示页（含 Canvas 图表）
-├── materials/      # 内置材质参数表（材质参数表.md + materials.json）
+├── index.html      # GitHub Pages 跳转入口（→ demo/）
+├── demo/           # Canvas 可视化演示页（index.html，含图表）
+├── docs/           # 文档（guide.md 使用指南 + materials-table.md 材质参数表）
+├── materials/      # 材质数据（materials.json，机器可读）
 ├── tests/          # 自动化测试（node:test，npm test）
-├── 使用指南.md      # 详细使用指南（三变量 → 摩擦力）
 ├── README.md       # 本文件
 ├── LICENSE         # MIT 许可证
 ├── package.json    # npm 元数据

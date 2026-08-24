@@ -18,9 +18,9 @@
   "files": [
     "rsf.js",
     "index.d.ts",
-    "index.html",
+    "demo/",
+    "docs/",
     "materials/",
-    "使用指南.md",
     "README.md",
     "LICENSE"
   ],

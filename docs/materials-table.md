@@ -1,6 +1,6 @@
 # 内置材质参数表
 
-> 本文件是 rsf.js 内置材质参数表（`RSF.materials`）的独立说明文档，由《使用指南》第四节拆分而来。机器可读版本见同目录 [`materials.json`](materials.json)，两者保持一致。
+> 本文件是 rsf.js 内置材质参数表（`RSF.materials`）的独立说明文档，由《使用指南》第四节拆分而来。机器可读版本见 [`../materials/materials.json`](../materials/materials.json)，两者保持一致。
 
 ---
 
