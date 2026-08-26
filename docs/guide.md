@@ -126,7 +126,7 @@ const 快 = RSF.computeFriction('granite', 1000, 1e-4).frictionForce; // 581.6 N
 
 ## 四、内置材质参数表
 
-库内置了 **76 种接触对**的参考参数（14 种岩石含 RSF 参数，62 种工程材料含库仑 `μ/μ_s`；每条记录均标注接触面对「材质A-材质B」）。完整参数表已拆分为独立文件：
+库内置了 **85 种接触对**的参考参数（14 种岩石含 RSF 参数，71 种工程材料含库仑 `μ/μ_s`；每条记录均标注接触面对「材质A-材质B」）。完整参数表已拆分为独立文件：
 
 - **[材质参数表.md](materials-table.md)** — 分类表格 + 数据来源与免责声明（可读文档，位于 `docs/`）
 - **[materials.json](../materials/materials.json)** — 机器可读数据文件（与 `RSF.materials` 一致，位于 `materials/`）

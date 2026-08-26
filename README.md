@@ -96,7 +96,7 @@ a − b < 0   且   k < k_crit = N·(b−a)/Dc
 
 - **零依赖**：单文件 UMD 模块，浏览器（`<script>`）与 Node.js（`require`）通用；
 - **三变量便捷接口** `computeFriction(材质, 法向力, 速度)`：一行代码得到摩擦力；
-- **内置 76 种接触对材质参数表**（14 种岩石含 RSF 参数，62 种工程材料含库仑 μ/μ_s，均明确标注接触面对，见 [`docs/materials-table.md`](docs/materials-table.md)）；
+- **内置 85 种接触对材质参数表**（14 种岩石含 RSF 参数，71 种工程材料含库仑 μ/μ_s，均明确标注接触面对，见 [`docs/materials-table.md`](docs/materials-table.md)）；
 - **自适应 Cash-Karp RK45 求解器**：速度阶跃直接效应、稳态摩擦、静态愈合均与解析解逐位吻合；
 - **四种状态演化律**：Dieterich 老化律、Ruina 滑移律、PRZ、Nagata；
 - 自带 **Canvas 可视化演示页**（[`demo/index.html`](demo/index.html)），直观展示锯齿形粘滑曲线；

@@ -931,6 +931,8 @@
     castiron_tin:   { name: '铸铁-锡（干）',     material1: '铸铁',   material2: '锡',     category: 'metal',   mu: 0.32, muS: 0.55 },
     castiron_lead:  { name: '铸铁-铅（干）',     material1: '铸铁',   material2: '铅',     category: 'metal',   mu: 0.43, muS: 0.54 },
     bronze_titanium:{ name: '青铜-钛（干）',     material1: '青铜',   material2: '钛',     category: 'metal',   mu: 0.27, muS: 0.36 },
+    copper_castiron:{ name: '铜-铸铁（干）',      material1: '铜',     material2: '铸铁',   category: 'metal',   mu: 0.29, muS: 1.05 },
+    aluminum_stainless:{ name: '铝-不锈钢（干）',  material1: '铝',     material2: '不锈钢', category: 'metal',   mu: 0.40, muS: 0.55 },
     // 聚合物类（库仑模式；配对对象不明者已移除，保留条目均注明接触对）
     rubber_concrete: { name: '橡胶-混凝土（干）',   material1: '橡胶',   material2: '混凝土', category: 'polymer', mu: 0.80, muS: 0.90 },
     rubber_concrete_wet: { name: '橡胶-混凝土（湿）',   material1: '橡胶',   material2: '混凝土', category: 'polymer', mu: 0.25, muS: 0.30 },
@@ -952,6 +954,8 @@
     pet_steel:    { name: '聚对苯二甲酸乙二醇酯(PET)-钢', material1: '聚对苯二甲酸乙二醇酯（PET）', material2: '钢', category: 'polymer', mu: 0.28, muS: 0.29 },
     pvdf_steel:   { name: '聚偏二氟乙烯(PVDF)-钢', material1: '聚偏二氟乙烯（PVDF）', material2: '钢', category: 'polymer', mu: 0.25, muS: 0.33 },
     fep_steel:    { name: '聚全氟乙丙烯(FEP)-钢', material1: '聚全氟乙丙烯（FEP）', material2: '钢', category: 'polymer', mu: 0.18, muS: 0.25 },
+    pctfe_steel:  { name: '聚三氟氯乙烯(PCTFE)-钢', material1: '聚三氟氯乙烯（PCTFE）', material2: '钢', category: 'polymer', mu: 0.33, muS: 0.45 },
+    pvdc_steel:   { name: '聚偏二氯乙烯(PVDC)-钢', material1: '聚偏二氯乙烯（PVDC）', material2: '钢', category: 'polymer', mu: 0.45, muS: 0.68 },
     // 其他非金属（库仑模式）
     glass:        { name: '玻璃-玻璃（干）',     material1: '玻璃',   material2: '玻璃',   category: 'other',   mu: 0.90, muS: 0.95 },
     wood:         { name: '木材-木材',           material1: '木材',   material2: '木材',   category: 'other',   mu: 0.30, muS: 0.40 },
@@ -974,7 +978,12 @@
     wood_steel:   { name: '木材-钢（干）',       material1: '木材',   material2: '钢',     category: 'other',   mu: 0.28, muS: 0.40 },
     brick:         { name: '砖-砖（干）',         material1: '砖',     material2: '砖',     category: 'other',   mu: 0.65, muS: 0.65 },
     graphite_steel: { name: '石墨-钢（干）',     material1: '石墨',   material2: '钢',     category: 'other',   mu: 0.10, muS: 0.10 },
-    leather_wood: { name: '皮革-木材（干）',     material1: '皮革',   material2: '木材',   category: 'other',   mu: 0.45, muS: 0.35 }
+    leather_wood: { name: '皮革-木材（干）',     material1: '皮革',   material2: '木材',   category: 'other',   mu: 0.45, muS: 0.35 },
+    oak:          { name: '橡木-橡木',             material1: '橡木',   material2: '橡木',   category: 'other',   mu: 0.48, muS: 0.62 },
+    leather_oak:  { name: '皮革-橡木（干）',       material1: '皮革',   material2: '橡木',   category: 'other',   mu: 0.52, muS: 0.61 },
+    copper_glass: { name: '铜-玻璃（干）',         material1: '铜',     material2: '玻璃',   category: 'other',   mu: 0.53, muS: 0.68 },
+    glass_nickel: { name: '玻璃-镍（干）',         material1: '玻璃',   material2: '镍',     category: 'other',   mu: 0.56, muS: 0.78 },
+    leather_castiron:{ name: '皮革-铸铁（干）',    material1: '皮革',   material2: '铸铁',   category: 'other',   mu: 0.56, muS: 0.60 }
   };
 
   /**

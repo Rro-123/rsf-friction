@@ -386,6 +386,22 @@
     "mu": 0.27,
     "muS": 0.36
   },
+  "copper_castiron": {
+    "name": "铜-铸铁（干）",
+    "material1": "铜",
+    "material2": "铸铁",
+    "category": "metal",
+    "mu": 0.29,
+    "muS": 1.05
+  },
+  "aluminum_stainless": {
+    "name": "铝-不锈钢（干）",
+    "material1": "铝",
+    "material2": "不锈钢",
+    "category": "metal",
+    "mu": 0.4,
+    "muS": 0.55
+  },
   "rubber_concrete": {
     "name": "橡胶-混凝土（干）",
     "material1": "橡胶",
@@ -537,6 +553,22 @@
     "category": "polymer",
     "mu": 0.18,
     "muS": 0.25
+  },
+  "pctfe_steel": {
+    "name": "聚三氟氯乙烯(PCTFE)-钢",
+    "material1": "聚三氟氯乙烯（PCTFE）",
+    "material2": "钢",
+    "category": "polymer",
+    "mu": 0.33,
+    "muS": 0.45
+  },
+  "pvdc_steel": {
+    "name": "聚偏二氯乙烯(PVDC)-钢",
+    "material1": "聚偏二氯乙烯（PVDC）",
+    "material2": "钢",
+    "category": "polymer",
+    "mu": 0.45,
+    "muS": 0.68
   },
   "glass": {
     "name": "玻璃-玻璃（干）",
@@ -706,5 +738,45 @@
     "category": "other",
     "mu": 0.45,
     "muS": 0.35
+  },
+  "oak": {
+    "name": "橡木-橡木",
+    "material1": "橡木",
+    "material2": "橡木",
+    "category": "other",
+    "mu": 0.48,
+    "muS": 0.62
+  },
+  "leather_oak": {
+    "name": "皮革-橡木（干）",
+    "material1": "皮革",
+    "material2": "橡木",
+    "category": "other",
+    "mu": 0.52,
+    "muS": 0.61
+  },
+  "copper_glass": {
+    "name": "铜-玻璃（干）",
+    "material1": "铜",
+    "material2": "玻璃",
+    "category": "other",
+    "mu": 0.53,
+    "muS": 0.68
+  },
+  "glass_nickel": {
+    "name": "玻璃-镍（干）",
+    "material1": "玻璃",
+    "material2": "镍",
+    "category": "other",
+    "mu": 0.56,
+    "muS": 0.78
+  },
+  "leather_castiron": {
+    "name": "皮革-铸铁（干）",
+    "material1": "皮革",
+    "material2": "铸铁",
+    "category": "other",
+    "mu": 0.56,
+    "muS": 0.6
   }
 }
