@@ -927,12 +927,17 @@
     // 金属-金属补充组合（Machinery's Handbook / StructX / eMachineShop 核对）
     copper:        { name: '铜-铜（干）',        material1: '铜',     material2: '铜',     category: 'metal',   mu: 1.00, muS: 1.00 },
     castiron_steel: { name: '铸铁-钢（干）',     material1: '铸铁',   material2: '钢',     category: 'metal',   mu: 0.23, muS: 0.40 },
+    // 金属补充组合（ASM Vol.18 / Engineering ToolBox 核对；均明确接触对）
+    castiron_tin:   { name: '铸铁-锡（干）',     material1: '铸铁',   material2: '锡',     category: 'metal',   mu: 0.32, muS: 0.55 },
+    castiron_lead:  { name: '铸铁-铅（干）',     material1: '铸铁',   material2: '铅',     category: 'metal',   mu: 0.43, muS: 0.54 },
+    bronze_titanium:{ name: '青铜-钛（干）',     material1: '青铜',   material2: '钛',     category: 'metal',   mu: 0.27, muS: 0.36 },
     // 聚合物类（库仑模式；配对对象不明者已移除，保留条目均注明接触对）
     rubber_concrete: { name: '橡胶-混凝土（干）',   material1: '橡胶',   material2: '混凝土', category: 'polymer', mu: 0.80, muS: 0.90 },
     rubber_concrete_wet: { name: '橡胶-混凝土（湿）',   material1: '橡胶',   material2: '混凝土', category: 'polymer', mu: 0.25, muS: 0.30 },
     ptfe_steel:    { name: '聚四氟乙烯(PTFE)-钢', material1: '聚四氟乙烯（PTFE）', material2: '钢', category: 'polymer', mu: 0.05, muS: 0.06 },
     nylon:        { name: '尼龙-尼龙',           material1: '尼龙',   material2: '尼龙',   category: 'polymer', mu: 0.25, muS: 0.25 },
     pe_steel:      { name: '聚乙烯(PE)-钢',       material1: '聚乙烯（PE）', material2: '钢', category: 'polymer', mu: 0.20, muS: 0.20 },
+    pe:            { name: '聚乙烯(PE)-聚乙烯(PE)', material1: '聚乙烯（PE）', material2: '聚乙烯（PE）', category: 'polymer', mu: 0.11, muS: 0.12 },
     // 聚合物补充组合（机械设计手册《各种工程用塑料的摩擦因数》/ Engineering ToolBox / GORTEF 核对）
     pom_steel:    { name: '聚甲醛(POM)-钢',      material1: '聚甲醛（POM）', material2: '钢', category: 'polymer', mu: 0.13, muS: 0.14 },
     pvc_steel:    { name: '聚氯乙烯(PVC)-钢',    material1: '聚氯乙烯（PVC）', material2: '钢', category: 'polymer', mu: 0.40, muS: 0.45 },
@@ -952,6 +957,7 @@
     wood:         { name: '木材-木材',           material1: '木材',   material2: '木材',   category: 'other',   mu: 0.30, muS: 0.40 },
     concrete:     { name: '混凝土-混凝土',       material1: '混凝土', material2: '混凝土', category: 'other',   mu: 0.75, muS: 1.00 },
     ice_steel:     { name: '冰-钢',               material1: '冰',     material2: '钢',     category: 'other',   mu: 0.03, muS: 0.10 },
+    ice:           { name: '冰-冰',               material1: '冰',     material2: '冰',     category: 'other',   mu: 0.03, muS: 0.10 },
     paper:        { name: '纸-纸',               material1: '纸',     material2: '纸',     category: 'other',   mu: 0.30, muS: 0.50 },
     graphite:     { name: '石墨-石墨',           material1: '石墨',   material2: '石墨',   category: 'other',   mu: 0.10, muS: 0.10 },
     diamond:      { name: '钻石-钻石',           material1: '钻石',   material2: '钻石',   category: 'other',   mu: 0.10, muS: 0.10 },

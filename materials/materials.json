@@ -362,6 +362,30 @@
     "mu": 0.23,
     "muS": 0.4
   },
+  "castiron_tin": {
+    "name": "铸铁-锡（干）",
+    "material1": "铸铁",
+    "material2": "锡",
+    "category": "metal",
+    "mu": 0.32,
+    "muS": 0.55
+  },
+  "castiron_lead": {
+    "name": "铸铁-铅（干）",
+    "material1": "铸铁",
+    "material2": "铅",
+    "category": "metal",
+    "mu": 0.43,
+    "muS": 0.54
+  },
+  "bronze_titanium": {
+    "name": "青铜-钛（干）",
+    "material1": "青铜",
+    "material2": "钛",
+    "category": "metal",
+    "mu": 0.27,
+    "muS": 0.36
+  },
   "rubber_concrete": {
     "name": "橡胶-混凝土（干）",
     "material1": "橡胶",
@@ -401,6 +425,14 @@
     "category": "polymer",
     "mu": 0.2,
     "muS": 0.2
+  },
+  "pe": {
+    "name": "聚乙烯(PE)-聚乙烯(PE)",
+    "material1": "聚乙烯（PE）",
+    "material2": "聚乙烯（PE）",
+    "category": "polymer",
+    "mu": 0.11,
+    "muS": 0.12
   },
   "pom_steel": {
     "name": "聚甲醛(POM)-钢",
@@ -534,6 +566,14 @@
     "name": "冰-钢",
     "material1": "冰",
     "material2": "钢",
+    "category": "other",
+    "mu": 0.03,
+    "muS": 0.1
+  },
+  "ice": {
+    "name": "冰-冰",
+    "material1": "冰",
+    "material2": "冰",
     "category": "other",
     "mu": 0.03,
     "muS": 0.1

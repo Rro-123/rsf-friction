@@ -164,9 +164,9 @@ test('makeVelocityFunction：支持数字 / 函数 / 分段数组', () => {
 // ---------------------------------------------------------------------------
 // 内置材质表完整性
 // ---------------------------------------------------------------------------
-test('内置材质表：至少 71 种接触对，且逐一可被 computeFriction 计算', () => {
+test('内置材质表：至少 76 种接触对，且逐一可被 computeFriction 计算', () => {
   const keys = Object.keys(RSF.materials);
-  assert.ok(keys.length >= 71, `材质接触对数应 ≥ 71，实际 ${keys.length}`);
+  assert.ok(keys.length >= 76, `材质接触对数应 ≥ 76，实际 ${keys.length}`);
   for (const k of keys) {
     const m = RSF.materials[k];
     assert.ok(typeof m.material1 === 'string' && m.material1.length > 0, `材质 ${k} 的 material1 应为非空字符串`);
