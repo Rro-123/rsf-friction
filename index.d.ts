@@ -1,5 +1,5 @@
 // rsf.js —— 速率-状态摩擦定律（Rate-and-State Friction, RSF）工具库
-// TypeScript 类型定义（v1.3.0）
+// TypeScript 类型定义（v1.4.0）
 
 /** 状态演化律名称。 */
 export type StateLaw = 'aging' | 'slip' | 'prz' | 'nagata';
@@ -286,6 +286,11 @@ export interface MaterialSpec {
 export interface ComputeFrictionOptions {
   mode?: 'rsf' | 'coulomb';
   theta?: number;
+  /**
+   * 静止保持时间 Δt (s)。RSF 模式且 ≥ 0 时，按老化律（θ = θ₀ + Δt）返回静止
+   * 愈合后的静摩擦 μ_s(θ₀+Δt) 与力——体现摩擦随静止时间的对数增长（时间依赖）。
+   */
+  holdTime?: number;
   sigma?: number;
   area?: number;
 }
@@ -300,6 +305,10 @@ export interface ComputeFrictionResult {
   muSS?: number;
   steadyForce?: number;
   theta?: number;
+  /** 静止愈合后的状态变量 θ₀ + Δt（仅同时传入 holdTime 时存在）。 */
+  thetaHealed?: number;
+  holdTime?: number;
+  healed?: boolean;
   weakening?: boolean;
   muKinetic?: number;
   muStatic?: number;
@@ -309,6 +318,47 @@ export interface ComputeFrictionResult {
 
 /** 三变量便捷接口：由「材质 + 法向力 + 速度」计算摩擦力。 */
 export function computeFriction(material: string | MaterialSpec, normalForce: number | null, velocity?: number, opts?: ComputeFrictionOptions): ComputeFrictionResult;
+
+// ---------------------------------------------------------------------------
+// 时间依赖便捷接口
+// ---------------------------------------------------------------------------
+
+/** frictionOverTime 选项。 */
+export interface FrictionOverTimeOptions extends IntegrateOptions {
+  /** 演化总时长 s（默认：分段取末段时间与 40 的较大者；数字/函数取 40）。 */
+  totalTime?: number;
+  /** 初始状态变量数组（默认稳态 θss(V(0))）。 */
+  theta0?: number[];
+  /** 库仑模式等距采样点数（默认 200）。 */
+  samples?: number;
+}
+
+/** frictionOverTime 返回结果。 */
+export interface FrictionOverTimeResult {
+  material: string;
+  mode: 'rsf' | 'coulomb';
+  /** 时间序列 (s)。 */
+  t: number[];
+  /** 摩擦系数序列 μ(t)。 */
+  mu: number[];
+  /** 摩擦力序列 F(t) = μ(t)·N (N)。 */
+  frictionForce: number[];
+  /** 状态变量序列 θ(t)（RSF 模式存在；库仑模式无）。 */
+  theta?: number[][];
+  /** 速度历史规格原样返回。 */
+  velocitySpec: VelocitySpec;
+  /** 实际使用的演化总时长 (s)。 */
+  totalTime?: number;
+  /** 是否速度弱化（RSF 模式）。 */
+  weakening?: boolean;
+  note?: string;
+}
+
+/**
+ * 时间依赖便捷接口：由「材质 + 法向力 + 速度历史」计算摩擦随时间的演化，
+ * 返回 μ(t)、θ(t)、F(t) 序列；体现速度阶跃直接效应、静止愈合、滑动历史演化。
+ */
+export function frictionOverTime(material: string | MaterialSpec, normalForce: number, velocitySpec: VelocitySpec, opts?: FrictionOverTimeOptions): FrictionOverTimeResult;
 
 // ---------------------------------------------------------------------------
 // 常量

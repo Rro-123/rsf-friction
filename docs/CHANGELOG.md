@@ -2,6 +2,17 @@
 
 本项目版本遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [1.4.0] - 2026-09-05
+
+### 新增
+- **时间依赖便捷接口** `RSF.frictionOverTime(材质, N, 速度历史, opts)`：返回 μ(t)、θ(t)、F(t) 演化序列，体现速度阶跃直接效应、静止愈合、滑动历史演化。
+- `computeFriction` 新增 `opts.holdTime`：RSF 模式传入静止保持时间 Δt，按老化律（θ = θ₀ + Δt）返回静止愈合后的静摩擦 μ_s(θ₀+Δt)。（类型、演示页面板 ①、文档同步更新。）
+
+### 文档
+- 新增 [README.md](README.md) 文档索引；README 精简为「概览 + 文档导航 + 物理模型 + 快速上手」；
+- 重组 [guide.md](guide.md)（教程）、[materials-table.md](materials-table.md)（参考）结构，消除跨文档重复、修正过时引用与 API 误标（`healingCurve` 为 `RateStateFriction` 方法而非顶层函数）；
+- 本文件（CHANGELOG）归入 `docs/`；根目录仅保留 npm 必需的入口文件（`rsf.js` / `index.d.ts` / `index.html` / `package.json` / `README.md` / `LICENSE` / `.gitignore`）。
+
 ## [1.3.0] - 2026-08-24
 
 ### 变更（键名规则统一，破坏性）

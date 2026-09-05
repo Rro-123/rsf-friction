@@ -996,6 +996,9 @@
    * @param {Object} opts
    *   mode  : 'rsf' | 'coulomb'（默认：材质含 RSF 参数时用 rsf，否则 coulomb）
    *   theta : RSF 模式的状态变量（默认稳态 Dc/V）
+   *   holdTime : 静止保持时间 Δt (s)。RSF 模式且 ≥ 0 时，按老化律（θ = θ₀ + Δt）
+   *              返回静止愈合后的静摩擦 μ_s(θ₀+Δt) 与力——体现摩擦随静止时间的对数
+   *              增长（时间依赖）。不传则返回瞬时/稳态 μ(V,θ)。
    *   sigma, area : 法向力 N = sigma(Pa) × area(m²) 的替代输入
    * @returns {Object} { material, mode, mu, frictionForce, muSS, steadyForce, ... }
    */
@@ -1034,15 +1037,103 @@
 
     var f = new RateStateFriction({ mu0: mat.mu0, a: mat.a, b: mat.b, Dc: mat.Dc, V0: mat.V0 });
     var vEff = Math.max(V, 1e-12);
-    var theta = opts.theta != null ? opts.theta : f.thetaSS(vEff, 0);
-    var mu = f.mu(vEff, [theta]);
+    var theta0 = opts.theta != null ? opts.theta : f.thetaSS(vEff, 0);
+    var hasHold = opts.holdTime != null && opts.holdTime >= 0;
+    // 老化律：静止保持 Δt 秒后 θ = θ₀ + Δt；愈合期求的是静摩擦 μ_s(θ)
+    var theta = hasHold ? (theta0 + opts.holdTime) : theta0;
+    var mu = hasHold ? f.staticMu(theta) : f.mu(vEff, [theta]);
     var muSS = f.muSS(vEff);
     var weakening = (f.a - f.sumB) < 0;
-    return {
+    var result = {
       material: mat.name, mode: 'rsf', velocity: V,
-      mu: mu, frictionForce: mu * N, muSS: muSS, steadyForce: muSS * N, theta: theta,
-      weakening: weakening,
-      note: 'RSF 模式 F = μ(V,θ)·N；' + (weakening ? '速度弱化 (a-b<0)，可能粘滑' : '速度强化 (a-b≥0)，稳定滑动')
+      mu: mu, frictionForce: mu * N, muSS: muSS, steadyForce: muSS * N,
+      theta: theta0, thetaHealed: theta, weakening: weakening,
+      note: hasHold
+        ? 'RSF 模式（静止愈合，θ = θ₀ + Δt）：静止保持 ' + opts.holdTime + ' s 后静摩擦 μ_s = μ₀ + b·ln(V₀(θ₀+Δt)/Dc)，随时间（静止时间）对数增长'
+        : 'RSF 模式 F = μ(V,θ)·N；' + (weakening ? '速度弱化 (a-b<0)，可能粘滑' : '速度强化 (a-b≥0)，稳定滑动')
+    };
+    if (hasHold) { result.holdTime = opts.holdTime; result.healed = true; }
+    return result;
+  }
+
+  /**
+   * 时间依赖便捷接口：由「材质 + 法向力 + 速度历史」计算摩擦随时间的演化。
+   *
+   * 与 computeFriction（瞬时/稳态单点）不同，这个接口把一条速度历史喂给 RSF
+   * 状态演化律，返回摩擦系数 μ(t)、状态变量 θ(t)、摩擦力 F(t) 的完整时间序列，
+   * 直接体现时间依赖性：速度阶跃的直接效应与松弛、静止愈合（θ 随时间增长）、
+   * 滑动历史的渐进演化等。
+   *
+   * @param {string|Object} material 材质名（见 RSF.materials），或自定义参数对象
+   *                                 { mu[, muS] } 库仑模式 / { mu0, a, b, Dc, V0 } RSF 模式
+   * @param {number} normalForce 法向力 N (N)
+   * @param {number|function|Array} velocitySpec 速度历史：数字（恒速）/ 函数 t -> V /
+   *                         [[t0,v0],[t1,v1],...]（分段常值，按时间排序）
+   * @param {Object} opts
+   *   totalTime : 演化总时长 s（默认：分段取末段时间与 40 的较大者；数字/函数取 40）
+   *   theta0    : 初始状态变量数组（默认稳态 θss(V(0))）
+   *   rtol, atol: ODE 容差（默认 1e-9 / 1e-11）
+   *   samples   : 库仑模式等距采样点数（默认 200）
+   * @returns {Object} { material, mode, t, mu, frictionForce, theta?, ... }
+   */
+  function frictionOverTime(material, normalForce, velocitySpec, opts) {
+    opts = opts || {};
+    var mat = (typeof material === 'string') ? materials[material] : material;
+    if (!mat) {
+      throw new Error('rsf.js: 未知材质 "' + material + '"（可用: ' + Object.keys(materials).join(', ') + '）');
+    }
+    if (!(normalForce > 0)) {
+      throw new Error('rsf.js: 需提供法向力 normalForce (>0)');
+    }
+    var N = normalForce;
+    var vf = makeVelocityFunction(velocitySpec);
+
+    // 推断总时长：优先用 opts.totalTime；分段数组取末段时间（至少 40s 保证有演化空间）
+    var totalTime;
+    if (opts.totalTime != null) {
+      totalTime = opts.totalTime;
+    } else if (Array.isArray(velocitySpec) && velocitySpec.length) {
+      var last = velocitySpec[velocitySpec.length - 1][0];
+      totalTime = Math.max(last > 0 ? last : 0, 40);
+    } else {
+      totalTime = 40;
+    }
+
+    var useRSF = (opts.mode === 'rsf') || (opts.mode !== 'coulomb' && mat.mu0 != null);
+
+    if (!useRSF) {
+      // 库仑模式：μ 为常数，与速度/时间无关（无明显时间依赖性），返回恒定序列
+      var muK = mat.mu;
+      var n = opts.samples || 200;
+      var tC = new Array(n);
+      var muC = new Array(n);
+      var fC = new Array(n);
+      for (var i = 0; i < n; i++) {
+        var tt = totalTime * i / (n - 1);
+        tC[i] = tt;
+        muC[i] = muK;
+        fC[i] = muK * N;
+      }
+      return {
+        material: mat.name, mode: 'coulomb',
+        t: tC, mu: muC, frictionForce: fC, velocitySpec: velocitySpec,
+        note: '库仑模式：μ 为常数，与速度/时间无关（无时间依赖性）'
+      };
+    }
+
+    var f = new RateStateFriction({ mu0: mat.mu0, a: mat.a, b: mat.b, Dc: mat.Dc, V0: mat.V0 });
+    var res = f.imposedVelocityResponse(vf, totalTime, {
+      theta0: opts.theta0, rtol: opts.rtol, atol: opts.atol
+    });
+    var fArr = new Array(res.t.length);
+    var weakening = (f.a - f.sumB) < 0;
+    for (var k = 0; k < res.t.length; k++) fArr[k] = res.mu[k] * N;
+    return {
+      material: mat.name, mode: 'rsf',
+      t: res.t, mu: res.mu, theta: res.theta, frictionForce: fArr,
+      velocitySpec: velocitySpec, totalTime: totalTime, weakening: weakening,
+      note: 'RSF 模式：μ(t)、θ(t) 随速度历史随时间演化；' +
+            (weakening ? '速度弱化 (a-b<0)，可能粘滑' : '速度强化 (a-b≥0)，稳定滑动')
     };
   }
 
@@ -1075,7 +1166,8 @@
     coulombForce: coulombForce,
     materials: materials,
     computeFriction: computeFriction,
+    frictionOverTime: frictionOverTime,
     presets: presets,
-    version: '1.3.0'
+    version: '1.4.0'
   };
 }));

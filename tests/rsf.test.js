@@ -17,7 +17,7 @@ function approx(actual, expected, tol, msg) {
 // 导出结构与版本
 // ---------------------------------------------------------------------------
 test('导出结构与版本号', () => {
-  assert.equal(RSF.version, '1.3.0');
+  assert.equal(RSF.version, '1.4.0');
   assert.equal(typeof RSF.RateStateFriction, 'function');
   assert.equal(typeof RSF.SpringBlockSlider, 'function');
   assert.equal(typeof RSF.StickSlipSlider, 'function');
@@ -189,4 +189,45 @@ test('materials.json 与 RSF.materials 完全一致', () => {
   for (const k of jsKeys) {
     assert.deepStrictEqual(json[k], RSF.materials[k], `材质 ${k} 的参数应与 rsf.js 一致`);
   }
+});
+
+// ---------------------------------------------------------------------------
+// 时间依赖接口：computeFriction + holdTime / frictionOverTime
+// ---------------------------------------------------------------------------
+test('computeFriction：静止愈合 holdTime 使 μ 大于稳态，且满足解析公式', () => {
+  const r0 = RSF.computeFriction('granite', 1000, 1e-5);
+  const r1 = RSF.computeFriction('granite', 1000, 1e-5, { holdTime: 1000 });
+  assert.equal(r0.mode, 'rsf');
+  assert.equal(r1.healed, true);
+  assert.ok(r1.mu > r0.mu, '静止愈合后 μ 应大于稳态');
+  // 解析式：μ_s(Δt) = μ₀ + b·ln(V₀(θ₀+Δt)/Dc)，θ₀ = Dc/V
+  const f = new RSF.RateStateFriction({ mu0: 0.6, a: 0.008, b: 0.012, Dc: 5e-6, V0: 1e-6 });
+  const V = 1e-5;
+  const theta0 = f.thetaSS(V, 0);
+  const expected = 0.6 + 0.012 * Math.log(f.V0 * (theta0 + 1000) / 5e-6);
+  approx(r1.mu, expected, 1e-9, '愈合 μ_s 解析式');
+  approx(r1.thetaHealed, theta0 + 1000, 1e-9, 'θ₀+Δt');
+});
+
+test('frictionOverTime：导出为函数，速度阶跃后末端 μ 趋近 μ_ss(V₂)', () => {
+  assert.equal(typeof RSF.frictionOverTime, 'function');
+  const r = RSF.frictionOverTime('granite', 1000, [[0, 1e-6], [10, 1e-5]], { totalTime: 30 });
+  assert.equal(r.mode, 'rsf');
+  assert.ok(r.mu.length >= 2);
+  assert.equal(r.mu.length, r.t.length);
+  assert.equal(r.frictionForce.length, r.mu.length);
+  const f = new RSF.RateStateFriction({ mu0: 0.6, a: 0.008, b: 0.012, Dc: 5e-6, V0: 1e-6 });
+  const lastMu = r.mu[r.mu.length - 1];
+  approx(lastMu, f.muSS(1e-5), 1e-5, '末端 μ 趋近 μ_ss(V₂)');
+});
+
+test('frictionOverTime：库仑模式返回恒定 μ', () => {
+  const r = RSF.frictionOverTime('steel', 1000, 0.5, { totalTime: 10 });
+  assert.equal(r.mode, 'coulomb');
+  assert.ok(r.mu.every(x => x === r.mu[0]), '库仑 μ 应恒定');
+  approx(r.frictionForce[0], 420, 1e-9, 'F = μ·N');
+});
+
+test('frictionOverTime：未知材质抛错', () => {
+  assert.throws(() => RSF.frictionOverTime('nonexistent', 1000, 1), /未知材质/);
 });

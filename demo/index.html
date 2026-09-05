@@ -95,7 +95,7 @@
     <div class="panel-body">
       <div class="grid">
         <div class="field" style="grid-column: 1 / -1;">
-          <label for="p1_material">材质（内置 71 种接触对参数表，选择后自动载入）</label>
+          <label for="p1_material">材质（内置 85 种接触对参数表，选择后自动载入）</label>
           <select id="p1_material" onchange="onMaterialChange('p1')"><option value="">—— 自定义（手动输入 RSF 参数）——</option></select>
         </div>
         <div class="field"><label for="p1_mu0">参考摩擦系数 μ₀</label><input id="p1_mu0" value="0.6"></div>
@@ -106,10 +106,11 @@
         <div class="field"><label for="p1_N">法向力 N (N)</label><input id="p1_N" value="1000"></div>
         <div class="field"><label for="p1_V">物体速度 V (m/s)</label><input id="p1_V" value="1e-5"></div>
         <div class="field"><label for="p1_theta">状态 θ (s，留空=稳态 Dc/V)</label><input id="p1_theta" value=""></div>
+        <div class="field"><label for="p1_holdTime">静止愈合 Δt (s，留空=不愈合，仅 RSF 材质)</label><input id="p1_holdTime" value="" placeholder="如 1000"></div>
       </div>
       <div class="actions">
         <button onclick="calcCore()">计算摩擦力</button>
-        <span class="muted">稳态法：θ = Dc/V；瞬时法：给定 θ。</span>
+        <span class="muted">稳态法：θ = Dc/V；瞬时法：给定 θ；静止愈合法：给定 Δt（摩擦随静止时间对数增长）</span>
       </div>
       <div class="note">
         本构：<span class="formula">μ(V,θ) = μ₀ + a·ln(V/V₀) + b·ln(V₀θ/Dc)</span>；稳态
@@ -459,7 +460,10 @@ function calcCore() {
     // 选择了内置材质 → 直接走 computeFriction（RSF / 库仑两种模式）
     if (matKey) {
       var m = RSF.materials[matKey];
-      var r = RSF.computeFriction(matKey, N, V);
+      var holdInput = document.getElementById('p1_holdTime').value.trim();
+      var opts = {};
+      if (holdInput !== '') opts.holdTime = parseFloat(holdInput);
+      var r = RSF.computeFriction(matKey, N, V, Object.keys(opts).length ? opts : undefined);
       var html = '<div class="kv">' +
         '<div class="item">材质：<b>' + esc(r.material) + '</b>（' + (r.mode === 'rsf' ? 'RSF 模式' : '库仑模式') + '）</div>' +
         '<div class="item">摩擦系数 μ = <b>' + fmt(r.mu, 6) + '</b></div>' +
@@ -468,6 +472,10 @@ function calcCore() {
         html += '<div class="item">稳态 μ<sub>ss</sub> = <b>' + fmt(r.muSS, 6) + '</b></div>' +
           '<div class="item">稳态 F<sub>ss</sub> = <b>' + fmt(r.steadyForce, 6) + ' N</b></div>' +
           '<div class="item">a − b → ' + (r.weakening ? '<span class="warn">速度弱化（可能粘滑）</span>' : '<span class="good">速度强化（稳定滑动）</span>') + '</div>';
+        if (r.healed) {
+          html += '<div class="item">静止愈合法 μ<sub>s</sub>(Δt) = <b>' + fmt(r.mu, 6) + '</b>（Δt = ' + fmt(r.holdTime, 4) + ' s，θ = θ₀+Δt = ' + fmt(r.thetaHealed, 4) + ' s）</div>' +
+            '<div class="item">愈合后最大静摩擦 F<sub>s</sub> = <b>' + fmt(r.frictionForce, 6) + ' N</b></div>';
+        }
       } else {
         html += '<div class="item">动摩擦 μ<sub>k</sub> = <b>' + fmt(r.muKinetic, 6) + '</b></div>' +
           '<div class="item">静摩擦 μ<sub>s</sub> = <b>' + fmt(r.muStatic, 6) + '</b></div>';
